@@ -24,7 +24,7 @@ DOCS = Path(__file__).resolve().parent / "docs"
 class Handler(http.server.SimpleHTTPRequestHandler):
     extensions_map = {**http.server.SimpleHTTPRequestHandler.extensions_map,
                       ".js": "text/javascript", ".mjs": "text/javascript", ".json": "application/json",
-                      ".woff2": "font/woff2", ".mp3": "audio/mpeg", ".md": "text/plain; charset=utf-8"}
+                      ".woff2": "font/woff2", ".mp3": "audio/mpeg", ".mp4": "video/mp4", ".md": "text/plain; charset=utf-8"}
 
     def log_message(self, *args) -> None:      # quiet console
         pass

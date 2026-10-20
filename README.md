@@ -7,13 +7,13 @@ A robot-mounted heat source drives the temperature field `T(x, t)` of a material
 - **`ehcc/`**: Python reference implementation (numpy, scipy): the thermal plant, the two controllers, the surface frame, and the 1D loop of the stability analysis, in the notation of the paper.
 - **`docs/`**: interactive pages (static HTML and JavaScript), also suitable for GitHub Pages: an overview with Fig. 1 and the video, the problem setup and notation, a closed-loop control demo in 2D and on 3D surfaces, and an animated version of the stability analysis (Fig. 5).
 
-Video: <https://youtu.be/wSFeCXYk3CU>
+Video of the experiments (7 min, 20× speed): [`docs/video/ehcc_experiments.mp4`](docs/video/ehcc_experiments.mp4), also on the overview page.
 
 ## Interactive pages
 
 | Page | Content |
 |---|---|
-| `index.html` | summary, Fig. 1, video, citation |
+| `index.html` | summary, Fig. 1, video of the experiments, citation |
 | `problem.html` | Sec. II: `Ω`, `Ω_ROI` from `T*`, error and heat deficit, heat equation (2), actuation `q_in = P η(d) K` (3)–(4), surface frame `R_s = [t₁, t₂, n]` (5); move the heat source by hand |
 | `control.html` | Secs. III–IV: ergodic law (10)–(16) and standoff law (17)–(24) in closed loop; targets T1–T5 (T4, the "dignity" shape of Fig. 2, by default), the interleaved case, and the 3D sole trial; flat, bump, wave, or scanned surface; uniform or heterogeneous material; gains; hot and cold disturbances; 2D and 3D views |
 | `stability.html` | Sec. V: the 1D loop of Fig. 5 (discrete and continuous gate laws), with the three steps of the analysis: reduction to the mean error, the monotone map `ē_ss(g)` and the Lyapunov function `V(g)`, the ultimate bound with a moving-source residual, and the discrete bound on `k_I` |

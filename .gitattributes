@@ -6,3 +6,4 @@
 *.woff2 binary
 *.npy binary
 *.npz binary
+*.mp4 binary
