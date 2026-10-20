@@ -6,6 +6,7 @@
 // the whole visit, so the music continues without a break while the pages
 // change. A page opened on its own (outside the player) gets its own engine,
 // also silent until turned on, which then resumes the saved track and position.
+import { fromPage, fromPlayer, inFrame, toPage, toPlayer } from './bridge.js';
 
 const TRACKS = [
     { src: 'audio/meditation-impromptu-01.mp3', title: 'Kevin MacLeod, Meditation Impromptu 01 (CC BY 4.0)' },
@@ -19,8 +20,9 @@ const TRACKS = [
 const POSITION = 'ehcc-music-position'; // sessionStorage: {track, time}
 const VOLUME = 0.3;
 
-const store = (storage, key, value) => { try { storage.setItem(key, value); } catch { /* unavailable */ } };
-const load = (storage, key) => { try { return storage.getItem(key); } catch { return null; } };
+// sessionStorage is read inside the try: in a sandboxed document, even reading it throws.
+const store = (key, value) => { try { sessionStorage.setItem(key, value); } catch { /* unavailable */ } };
+const load = (key) => { try { return sessionStorage.getItem(key); } catch { return null; } };
 
 // One audio element, a playlist, fades, and listeners for the button(s).
 export function createMusicEngine() {
@@ -33,7 +35,7 @@ export function createMusicEngine() {
     // track and position are resumed.
     let track = Math.floor(Math.random() * TRACKS.length), startAt = 0;
     try {
-        const saved = JSON.parse(load(sessionStorage, POSITION) || 'null');
+        const saved = JSON.parse(load(POSITION) || 'null');
         if (saved && Number.isInteger(saved.track) && TRACKS[saved.track]) { track = saved.track; startAt = saved.time || 0; }
     } catch { /* ignore */ }
 
@@ -47,7 +49,7 @@ export function createMusicEngine() {
         }
     }
     function savePosition() {
-        if (audio.src) store(sessionStorage, POSITION, JSON.stringify({ track, time: audio.currentTime || 0 }));
+        if (audio.src) store(POSITION, JSON.stringify({ track, time: audio.currentTime || 0 }));
     }
     function fadeTo(target, ms, then) {
         clearInterval(fader);
@@ -114,12 +116,39 @@ export function createMusicEngine() {
     return engine;
 }
 
-// The engine of the enclosing player, if this page runs inside player.html.
+// The engine of the enclosing player, if this page runs inside player.html:
+// the button sends its actions to the player and shows the state it receives.
 function playerEngine() {
-    try {
-        if (window.top !== window && window.top.ehccMusic) return window.top.ehccMusic;
-    } catch { /* not same-origin */ }
-    return null;
+    if (!inFrame()) return null;
+    const listeners = new Set();
+    let state = { on: false, blocked: false, playing: false, title: '' };
+    fromPlayer('music', (message) => {
+        state = { ...state, ...message.state };
+        listeners.forEach((fn) => fn());
+    });
+    toPlayer('music-hello');
+    return {
+        get on() { return state.on; },
+        get blocked() { return state.blocked; },
+        get playing() { return state.playing; },
+        get title() { return state.title; },
+        toggle() { toPlayer('music-do', { action: 'toggle' }); },
+        gesture() { toPlayer('music-do', { action: 'gesture' }); },
+        next() { toPlayer('music-do', { action: 'next' }); },
+        subscribe(fn) { listeners.add(fn); return () => listeners.delete(fn); },
+    };
+}
+
+// Player side: serve the engine to the pages loaded in `frame`.
+export function serveMusic(frame, engine) {
+    const send = () => toPage(frame, 'music', {
+        state: { on: engine.on, blocked: engine.blocked, playing: engine.playing, title: engine.title },
+    });
+    engine.subscribe(send);
+    fromPage(frame, 'music-hello', send);
+    fromPage(frame, 'music-do', ({ action }) => {
+        if (action === 'toggle' || action === 'gesture' || action === 'next') engine[action]();
+    });
 }
 
 // Bind the top-bar button to the player's engine (or to a page-local one).

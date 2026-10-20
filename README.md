@@ -5,8 +5,8 @@ Code and interactive pages for the paper *Ergodic Heat Coverage Control: Model-F
 A robot-mounted heat source drives the temperature field `T(x, t)` of a material surface to a target distribution `T*(x)` on a region of interest `Ω_ROI`, without a thermal model of the material. EHCC closes the loop on the measured error `e = T* − T` with two decoupled controllers: an ergodic coverage controller moves the focal point `p(t)` so that the time-averaged heat footprint matches the heat deficit `e₊`, and a standoff controller sets the source-to-surface distance `d(t)`, and with it the injected power, through an integral law on the mean error. The stability analysis establishes global uniform ultimate boundedness (GUUB) of the error.
 
 - **`ehcc/`**: Python reference implementation (numpy, scipy): the thermal plant, the two controllers, the surface frame, the five controllers of the simulation benchmark, and the 1D loop of the stability analysis, in the notation of the paper.
-- **`figures/`, `examples/benchmark.py`**: scripts that generate the simulation figures (Figs. 4–9) and the tables of the simulation benchmark (Tables II–III).
-- **`docs/`**: interactive pages (static HTML and JavaScript), also suitable for GitHub Pages: an overview with Fig. 1 and the video, the problem setup and notation, a closed-loop control demo in 2D and on 3D surfaces, and an animated version of the stability analysis (Fig. 5).
+- **`figures/`, `examples/benchmark.py`**: scripts that generate the simulation figures (Figs. 4–8) and the tables of the simulation benchmark (Tables II–III).
+- **`docs/`**: interactive pages (static HTML and JavaScript), also suitable for GitHub Pages: an overview with Fig. 1 and the video, the problem setup and notation, a closed-loop control demo in 2D and on 3D surfaces, and an animated version of the stability analysis (Fig. 4).
 
 Video of the experiments (7 min, 20× speed): [`docs/video/ehcc_experiments.mp4`](docs/video/ehcc_experiments.mp4), also on the overview page.
 
@@ -17,7 +17,7 @@ Video of the experiments (7 min, 20× speed): [`docs/video/ehcc_experiments.mp4`
 | `index.html` | summary, Fig. 1, video of the experiments, citation |
 | `problem.html` | Sec. II: `Ω`, `Ω_ROI` from `T*`, error and heat deficit, heat equation (2), actuation `q_in = P η(d) K` (3)–(4), surface frame `R_s = [t₁, t₂, n]` (5); move the heat source by hand |
 | `control.html` | Secs. III–IV: ergodic law (10)–(16) and standoff law (17)–(24) in closed loop; targets T1–T5 (T4, the "dignity" shape of Fig. 2, by default), the interleaved case, and the 3D sole trial; flat, bump, wave, or scanned surface; uniform or heterogeneous material; gains; hot and cold disturbances; 2D and 3D views |
-| `stability.html` | Sec. V: the 1D loop of Fig. 5 (discrete and continuous gate laws), with the three steps of the analysis: reduction to the mean error, the monotone map `ē_ss(g)` and the Lyapunov function `V(g)`, the ultimate bound with a moving-source residual, and the discrete bound on `k_I` |
+| `stability.html` | Sec. V: the 1D loop of Fig. 4 (discrete and continuous gate laws), with the three steps of the analysis: reduction to the mean error, the monotone map `ē_ss(g)` and the Lyapunov function `V(g)`, the ultimate bound with a moving-source residual, and the discrete bound on `k_I` |
 
 To open them locally (Python standard library only):
 
@@ -25,7 +25,14 @@ To open them locally (Python standard library only):
 python run.py            # serves docs/ at http://127.0.0.1:8765 and opens the browser
 ```
 
-For GitHub Pages, select *Deploy from a branch*, branch `main`, folder `/docs`. The pages need no build step: KaTeX (equations) and three.js r160 (3D views) are included in `docs/vendor/`. The ♪ button plays optional background music (calm piano pieces; public domain and CC BY 4.0, see `docs/audio/CREDITS.md`), and ◐ switches between the light and dark themes.
+`docs/index.html` also opens directly from the disk. For GitHub Pages, select *Deploy from a branch*, branch `main`, folder `/docs`. The pages load only classic scripts, a style sheet with embedded fonts, and their data as a script (no ES modules, font files, or `fetch` requests). They therefore also work on hosts that serve every page in a sandboxed origin without CORS headers, such as the anonymized pages of anonymous.4open.science. KaTeX (equations) and three.js r160 (3D views) are included in `docs/vendor/`. The ♪ button plays optional background music (calm piano pieces; public domain and CC BY 4.0, see `docs/audio/CREDITS.md`), and ◐ switches between the light and dark themes.
+
+The sources of the pages are ES modules in `docs/js/lib`, `docs/js/pages`, and `docs/js/sim` (the JavaScript port of `ehcc/`). After editing them or `docs/data/fields.json`, rebuild the files that the pages load (Node.js is needed; `npx` fetches esbuild):
+
+```bash
+python tools/build_web.py     # docs/js/dist/*.js, docs/vendor/katex/katex.inline.min.css, docs/data/fields.js
+python run.py --sandbox       # check the pages as anonymous.4open.science serves them
+```
 
 ## Python package
 
@@ -52,18 +59,17 @@ Run the scripts from the repository root; the figures are written to `outputs/fi
 
 | Result | Script | Time |
 |---|---|---|
-| Fig. 4, principle of EHCC (Sec. III) | `python figures/fig4_principle.py` | 1 min |
-| Fig. 5, 1D loop with discrete and continuous gate laws (Sec. V) | `python figures/fig5_ki_comparison.py` | 10 s |
-| Fig. 6, ergodic metric under parameter ablations (Sec. V-C) | `python figures/fig6_ablation.py` | 1 min |
+| Fig. 4, 1D loop with discrete and continuous gate laws (Sec. V) | `python figures/fig4_ki_comparison.py` | 10 s |
+| Fig. 5, ergodic metric under parameter ablations (Sec. V-C) | `python figures/fig5_ablation.py` | 1 min |
 | Tables II and III, simulation benchmark (Sec. VI) | `python examples/benchmark.py` | 10 min |
-| Figs. 7 and 8, error, cost, and trajectories of the benchmark | `python figures/fig7_fig8_benchmark.py` | uses the runs of the benchmark |
-| Fig. 9, interleaved heterogeneity (Sec. VI-E) | `python figures/fig9_interleaved.py` (`--full` adds error and cost) | uses the runs of the benchmark |
+| Figs. 6 and 7, error, cost, and trajectories of the benchmark | `python figures/fig6_fig7_benchmark.py` | uses the runs of the benchmark |
+| Fig. 8, interleaved heterogeneity (Sec. VI-E) | `python figures/fig8_interleaved.py` (`--full` adds error and cost) | uses the runs of the benchmark |
 
-The benchmark runs are saved in `outputs/benchmark/<target>/<method>.npz` and computed by the figure scripts if missing. The computation times of the controllers (cost columns and the cost panels of Figs. 7 and 9) depend on the machine.
+The benchmark runs are saved in `outputs/benchmark/<target>/<method>.npz` and computed by the figure scripts if missing. The computation times of the controllers (cost columns and the cost panels of Figs. 6 and 8) depend on the machine.
 
 ## Tests
 
-The tests check the model (kernel normalization, monotone actuation, heat conservation of the diffusion step, spectral coefficients, orthonormal surface frame), reproduce the rows of Table II for target T4 of EHCC (⟨ē⟩ = −0.11 °C, ⟨σ_e⟩ = 2.82 °C, ∫‖e‖ dt = 1.11 × 10⁵), Greedy-A, GTM, and LQG-M, the monotone map of Lemma 1 and the regime equilibria of Fig. 5 (g* = 0.31, 0.03, 0.66), and the behaviour of the discrete gate for k_I = 0.1 and 20. `tests/test_web_parity.py` runs the JavaScript port of the pages with Node.js (skipped without it) and checks that it gives the same logs as the package.
+The tests check the model (kernel normalization, monotone actuation, heat conservation of the diffusion step, spectral coefficients, orthonormal surface frame), reproduce the rows of Table II for target T4 of EHCC (⟨ē⟩ = −0.11 °C, ⟨σ_e⟩ = 2.82 °C, ∫‖e‖ dt = 1.11 × 10⁵), Greedy-A, GTM, and LQG-M, the monotone map of Lemma 1 and the regime equilibria of Fig. 4 (g* = 0.31, 0.03, 0.66), and the behaviour of the discrete gate for k_I = 0.1 and 20. `tests/test_web_parity.py` runs the JavaScript port of the pages with Node.js (skipped without it) and checks that it gives the same logs as the package, and `tests/test_web_build.py` checks that the files built by `tools/build_web.py` match their sources.
 
 ### Paper and code
 
@@ -93,15 +99,16 @@ The tests check the model (kernel normalization, monotone actuation, heat conser
 ```
 ehcc/                 Python package (config, domain, thermal, ergodic, standoff, surface, simulation, benchmark, baselines, stability, plotting, viewer3d)
 examples/             run_2d.py, run_3d.py, benchmark.py, export_web_data.py
-figures/              fig4_principle.py, fig5_ki_comparison.py, fig6_ablation.py, fig7_fig8_benchmark.py, fig9_interleaved.py
-tests/                unit tests, rows of Table II, Fig. 5 equilibria, parity of the web port
+figures/              fig4_ki_comparison.py, fig5_ablation.py, fig6_fig7_benchmark.py, fig8_interleaved.py
+tests/                unit tests, rows of Table II, Fig. 4 equilibria, parity of the web port
 assets/               targets T1-T5, interleaved case, 3D trial; material layouts; scanned surface
-docs/                 interactive pages: html, css, js/sim (port of ehcc), js/lib, js/pages, data, img, audio, vendor
+docs/                 interactive pages: html, css, js/sim (port of ehcc), js/lib, js/pages, js/dist (built), data, img, audio, vendor
+tools/                build_web.py (builds the files that the pages load)
 config.yaml           default parameters
 run.py                local server for docs/
 ```
 
-`docs/data/fields.json` holds the targets, material layouts, and scanned surface resampled to the simulation grid; regenerate it with `python examples/export_web_data.py`.
+`docs/data/fields.json` holds the targets, material layouts, and scanned surface resampled to the simulation grid; regenerate it with `python examples/export_web_data.py`, then run `python tools/build_web.py`.
 
 ## Citation
 

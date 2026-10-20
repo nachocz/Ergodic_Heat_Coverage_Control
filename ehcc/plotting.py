@@ -7,12 +7,12 @@ from typing import Iterable, Optional
 import matplotlib.pyplot as plt
 import numpy as np
 
-ROI = "#1fbf8f"            # Omega_ROI outline (Figs. 2-4)
-D_GREEN = "#1b6e20"        # d(t), d_lb(t) (Figs. 11-16)
+ROI = "#1fbf8f"            # Omega_ROI outline (Figs. 2-3)
+D_GREEN = "#1b6e20"        # d(t), d_lb(t) (Figs. 10-15)
 P_X, P_Y = "#e41a1c", "#1f3fd1"
 E_BLUE = "#1f77b4"
 HOT, COLD = "#c62828", "#1f5fa8"
-# Fig. 5: discrete k_I = 0.1 / 20, continuous k_I = 0.1 / 20
+# Fig. 4: discrete k_I = 0.1 / 20, continuous k_I = 0.1 / 20
 STABILITY = {"d_low": "#1f6feb", "d_high": "#d62728", "c_low": "#2ca02c", "c_high": "#9467bd"}
 
 

@@ -1,4 +1,4 @@
-// Stability analysis: the idealized 1D loop of Fig. 5, and the three steps of Sec. V.
+// Stability analysis: the idealized 1D loop of Fig. 4, and the three steps of Sec. V.
 import { LinePlot } from '../lib/plot.js';
 import { initPage } from '../lib/shell.js';
 import { alpha, onThemeChange, palette } from '../lib/theme.js';
@@ -28,7 +28,7 @@ let run = null, compare = null, token = 0;
 const derived = {};
 
 // ------------------------------------------------------------------ controls
-const mainCard = card('Idealized 1D loop (Sec. V-B, Fig. 5)', '');
+const mainCard = card('Idealized 1D loop (Sec. V-B, Fig. 4)', '');
 const playButton = button('▶ Play', () => setPlaying(!state.playing), { primary: true });
 const restartButton = button('Restart', () => { state.time = 0; setPlaying(true); });
 const timeSlider = slider({ label: 'time $t$', min: 0, max: 100, step: 0.01, value: 0, format: (v) => `${v.toFixed(1)} s`,
@@ -44,7 +44,7 @@ const g0Slider = slider({ label: 'initial gate $g(0)$', min: 0, max: 1, step: 0.
 const tauSlider = slider({ label: 'sweep period $\\tau_{\\mathrm{erg}}$ of a moving source', description: '0: ideal distributed heating (27). $\\tau_{\\mathrm{th}}=1/\\mu_0\\approx' + (1 / muTh).toFixed(1) + '$ s (32).',
     min: 0, max: 2, step: 0.05, value: 0, format: (v) => (v === 0 ? 'ideal' : `${v.toFixed(2)} s`), onChange: (v) => { state.tauErg = v; recompute(); } });
 const distToggle = toggle({ label: 'hot and cold disturbances $D_{\\mathrm{ext}}$', value: true, onChange: (v) => { state.disturbances = v; recompute(); } });
-const compareButton = button('Compare the four cases (Fig. 5)', () => computeCompare(), { small: true });
+const compareButton = button('Compare the four cases (Fig. 4)', () => computeCompare(), { small: true });
 mainCard.body.append(
     h('div', { class: 'toolbar' }, playButton, restartButton, h('span', { class: 'hint' }, 'speed'), speedSeg.el, h('span', { class: 'toolbar-divider' }), timeSlider.el),
     progress,
@@ -233,7 +233,7 @@ function draw() {
     profilePlot.set({ series, fills, markers, spans: [{ x0: loop.roi[0], x1: loop.roi[1], color: p.roi1d }],
         hlines: [{ y: loop.Tsource, color: 'firebrick', dash: [6, 3, 1, 3] }, { y: loop.Tamb, color: p.muted, dash: [1, 3] }, { y: 0, color: alpha(p.ink, 0.25), dash: [] }] });
 
-    // bottom row of Fig. 5
+    // bottom row of Fig. 4
     const gLines = (state.disturbances ? REGIMES : [{ t0: 0, t1: 100, A: 0 }]).map((r) => ({ y: mapOf(r.A).gStar, x0: r.t0, x1: r.t1, color: p.ink, dash: [5, 3], width: 1.2 }));
     const runSeries = (key) => [{ x: derived.t, y: derived[key], color: caseColor, width: 1.6 }];
     let gSeries = runSeries('g'), QSeries = runSeries('Q'), eSeries = runSeries('e'), VSeries = runSeries('V');
@@ -246,7 +246,7 @@ function draw() {
     }
     bottom.g.plot.set({ series: gSeries, hlines: gLines, vlines: cursor, spans });
     const qs = QSeries.flatMap((q) => q.y).filter(Number.isFinite).sort((a, b) => a - b);
-    bottom.Q.plot.opts.y = [0, 1.15 * (qs[Math.floor(0.99 * (qs.length - 1))] || 1)];      // as in Fig. 5, the start-up peak is clipped
+    bottom.Q.plot.opts.y = [0, 1.15 * (qs[Math.floor(0.99 * (qs.length - 1))] || 1)];      // as in Fig. 4, the start-up peak is clipped
     bottom.Q.plot.set({ series: QSeries, vlines: cursor, spans });
     bottom.e.plot.opts.y = compare || state.tauErg === 0 ? [-2.5, 5] : null;
     bottom.e.plot.set({ series: eSeries, vlines: cursor, spans, hlines: [{ y: 0, color: alpha(p.ink, 0.4), dash: [2, 3] }] });

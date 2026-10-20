@@ -1,4 +1,4 @@
-"""Idealized one-dimensional loop of the stability analysis (Sec. V, Fig. 5).
+"""Idealized one-dimensional loop of the stability analysis (Sec. V, Fig. 4).
 
 Distributed heating q_in = g k_p e_+ (27) on Omega = [0, 1], Omega_ROI = [0.2, 0.6]:
 

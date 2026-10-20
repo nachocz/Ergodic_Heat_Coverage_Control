@@ -1,8 +1,8 @@
-"""Fig. 5: the idealized 1D loop of Sec. V with the continuous gate law (24) and its
+"""Fig. 4: the idealized 1D loop of Sec. V with the continuous gate law (24) and its
 explicit-Euler version (41), each at k_I = 0.1 and k_I = 20, over five 20 s regimes
 (start-up, hot disturbance, recovery, cold disturbance, recovery).
 
-    python figures/fig5_ki_comparison.py      writes outputs/figures/fig5_ki_comparison.pdf and .png (about 10 s)
+    python figures/fig4_ki_comparison.py      writes outputs/figures/fig4_ki_comparison.pdf and .png (about 10 s)
 """
 import os
 import sys
@@ -60,7 +60,7 @@ def main() -> None:
         kind, k_I = CASES[key]
         t = run["t"]
         g_ref = np.select([t < b for _, b, _ in REGIMES], g_star, g_star[-1])
-        V = np.maximum(0.5 * (run["gate"] - g_ref) ** 2, 1e-5)    # quadratic form of (30), as in Fig. 5
+        V = np.maximum(0.5 * (run["gate"] - g_ref) ** 2, 1e-5)    # quadratic form of (30), as in Fig. 4
         style_kw = dict(color=STABILITY[key], ls="-" if kind == "Discrete" else "--",
                         lw=1.1 if key == "d_high" else 1.5, alpha=0.45 if key == "d_high" else 1.0)
         for ax, y in zip(axes, (run["gate"], run["Q_in"], run["e_mean"], V)):
@@ -82,8 +82,8 @@ def main() -> None:
     out = os.path.join("outputs", "figures")
     os.makedirs(out, exist_ok=True)
     for ext in ("png", "pdf"):
-        fig.savefig(os.path.join(out, f"fig5_ki_comparison.{ext}"), dpi=200, bbox_inches="tight")
-    print(f"written: {out}/fig5_ki_comparison.pdf and .png")
+        fig.savefig(os.path.join(out, f"fig4_ki_comparison.{ext}"), dpi=200, bbox_inches="tight")
+    print(f"written: {out}/fig4_ki_comparison.pdf and .png")
 
 
 if __name__ == "__main__":

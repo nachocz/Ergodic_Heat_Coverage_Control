@@ -1,9 +1,9 @@
-"""Fig. 9: interleaved material heterogeneity (Sec. VI-E): T*, the material layout
+"""Fig. 8: interleaved material heterogeneity (Sec. VI-E): T*, the material layout
 (metal/rubber checkerboard with a centred metal disk in a rubber annulus), and, for each
 method, the final temperature with the first 7000 steps of the trajectory (start: green).
 
-    python figures/fig9_interleaved.py           writes outputs/figures/fig9_interleaved.pdf (and .png)
-    python figures/fig9_interleaved.py --full    adds ||e||_L2(t) and the computation cost
+    python figures/fig8_interleaved.py           writes outputs/figures/fig8_interleaved.pdf (and .png)
+    python figures/fig8_interleaved.py --full    adds ||e||_L2(t) and the computation cost
 
 The runs are taken from outputs/benchmark/interleaved (see examples/benchmark.py) and
 computed if missing; the metrics of Table III are printed.
@@ -112,7 +112,7 @@ def main():
                    bbox_to_anchor=(0.5, 0.005))
 
     os.makedirs(OUT, exist_ok=True)
-    name = "fig9_interleaved_full" if args.full else "fig9_interleaved"
+    name = "fig8_interleaved_full" if args.full else "fig8_interleaved"
     for ext in ("pdf", "png"):
         fig.savefig(os.path.join(OUT, f"{name}.{ext}"))
     plt.close(fig)

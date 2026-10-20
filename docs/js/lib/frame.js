@@ -2,9 +2,12 @@
 // while the pages change. A page opened on its own is moved into the player
 // (append ?standalone to the address to prevent this); inside the player, the
 // page keeps the address bar and the tab title in step with what is shown.
+import { fromPage, inFrame, toPlayer } from './bridge.js';
 
 const PLAYER = 'player.html';
 export const PAGES = ['index.html', 'problem.html', 'control.html', 'stability.html'];
+// Addresses that the player loads in its frame: only the pages of this site.
+export const PAGE_ADDRESS = /^(index|problem|control|stability)\.html(\?[\w=&.-]*)?(#[\w-]*)?$/;
 
 function currentPage() {
     const page = location.pathname.split('/').pop() || 'index.html';
@@ -16,18 +19,24 @@ function currentPage() {
 
 // True if the page is being replaced by the player (stop initializing).
 export function enterPlayer() {
-    if (window.top !== window) return false;
+    if (inFrame()) return false;
     if (new URLSearchParams(location.search).has('standalone')) return false;
     location.replace(`${PLAYER}?p=${encodeURIComponent(currentPage())}`);
     return true;
 }
 
-// Inside the player: mirror this page's address and title in the top window.
+// Inside the player: send this page's address and title to the player.
 export function syncPlayer() {
-    if (window.top === window) return;
-    try {
-        const page = currentPage();
-        window.top.history.replaceState(null, '', page.startsWith('index.html') ? PLAYER : `${PLAYER}?p=${encodeURIComponent(page)}`);
-        window.top.document.title = document.title;
-    } catch { /* not same-origin */ }
+    toPlayer('page', { page: currentPage(), title: document.title });
+}
+
+// Player side: show the address and title of the page in the frame.
+export function servePage(frame) {
+    fromPage(frame, 'page', ({ page, title }) => {
+        if (typeof page !== 'string' || !PAGE_ADDRESS.test(page)) return;
+        if (typeof title === 'string') document.title = title;
+        try {
+            history.replaceState(null, '', page.startsWith('index.html') ? PLAYER : `${PLAYER}?p=${encodeURIComponent(page)}`);
+        } catch { /* not allowed in a sandboxed document */ }
+    });
 }

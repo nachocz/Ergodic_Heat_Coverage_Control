@@ -15,13 +15,13 @@ ASSETS = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))
 
 # Target temperature distributions of the paper, in assets/targets/.
 TARGETS: Dict[str, str] = {
-    "T1": "T1.npy",                     # Sec. VI, Fig. 8
+    "T1": "T1.npy",                     # Sec. VI, Fig. 7
     "T2": "T2.npy",
     "T3": "T3.npy",
     "T4": "T4_dignity.npy",             # the "dignity" shape of Fig. 2
     "T5": "T5.npy",                     # heterogeneous domain (left half metallic)
-    "interleaved": "T_interleaved.npy",  # Sec. VI-E, Fig. 9
-    "sole_3d": "sole_3d.npy",           # experiment on the scanned 3D sole, Sec. VII, Fig. 16
+    "interleaved": "T_interleaved.npy",  # Sec. VI-E, Fig. 8
+    "sole_3d": "sole_3d.npy",           # experiment on the scanned 3D sole, Sec. VII, Fig. 15
 }
 # Material maps (lambda, kappa) per cell, in assets/materials/.
 MATERIALS: Dict[str, str] = {"halves": "T5_halves.npy", "interleaved": "interleaved.npy"}

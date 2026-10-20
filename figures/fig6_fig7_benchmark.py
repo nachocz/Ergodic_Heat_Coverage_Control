@@ -1,10 +1,10 @@
-"""Figs. 7 and 8: the simulation benchmark of Sec. VI on targets T1-T5.
+"""Figs. 6 and 7: the simulation benchmark of Sec. VI on targets T1-T5.
 
-    Fig. 7: ||e||_L2(Omega_ROI)(t) and controller computation time, one column per target.
-    Fig. 8: T* and, for each method, the temperature at the snapshot nearest to step 1000
+    Fig. 6: ||e||_L2(Omega_ROI)(t) and controller computation time, one column per target.
+    Fig. 7: T* and, for each method, the temperature at the snapshot nearest to step 1000
             with the trajectory up to that step (start: green circle, end: red square).
 
-    python figures/fig7_fig8_benchmark.py      writes outputs/figures/fig7_*.pdf, fig8_*.pdf (and .png)
+    python figures/fig6_fig7_benchmark.py      writes outputs/figures/fig6_*.pdf, fig7_*.pdf (and .png)
 
 The runs are taken from outputs/benchmark (see examples/benchmark.py) and computed if
 missing (about 10 min for all of them).
@@ -28,7 +28,7 @@ OUT = os.path.join("outputs", "figures")
 TWO_LINES = {"ehcc": "EHCC\n(ours)", "ehcc_na": "EHCC-NA\n(ours)", "greedy": "Greedy-A\n(ours)",
              "gtm": "GTM\n(Hu 2021)", "lqg_m": "LQG-M\n(Jon. 2003)", "mpdc": "MPDC\n(Mud. 2022)"}
 SHADE = ["#ff6666", "#6699ff"]           # hot, cold
-CUTOFF = 1000                            # trajectory shown up to this step in Fig. 8
+CUTOFF = 1000                            # trajectory shown up to this step in Fig. 7
 
 plt.rcParams.update({
     "text.usetex": False, "font.family": "serif", "font.serif": ["DejaVu Serif", "Times New Roman", "Times"],
@@ -82,7 +82,7 @@ def fig7(runs):
     fig.legend(handles, labels, loc="lower center", ncol=len(handles), framealpha=0.9, edgecolor="0.7",
                bbox_to_anchor=(0.5, -0.06))
     plt.subplots_adjust(wspace=0.32, hspace=0.15, left=0.08, right=0.98, top=0.92, bottom=0.22)
-    save(fig, "fig7_l2_ctrl_time")
+    save(fig, "fig6_l2_ctrl_time")
 
 
 def fig8(runs):
@@ -118,7 +118,7 @@ def fig8(runs):
     cb = fig.colorbar(sm, cax=fig.add_subplot(gs[:, -1]))
     cb.set_label(r"$T$  [$^\circ$C]", fontsize=39)
     cb.ax.tick_params(labelsize=33)
-    save(fig, "fig8_trajectories")
+    save(fig, "fig7_trajectories")
 
 
 def main():

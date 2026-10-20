@@ -1,4 +1,4 @@
-// Idealized 1D loop of the stability analysis (Sec. V, Fig. 5): port of ehcc/stability.py.
+// Idealized 1D loop of the stability analysis (Sec. V, Fig. 4): port of ehcc/stability.py.
 //   dT/dt = alpha T'' - h (T - T_amb) + g k_p e_+ + D_ext,    dg/dt = k_I e_bar,  g in [0, 1].
 // The "continuous" mode integrates the same equations with sub-steps small enough
 // that k_I dt is negligible, as a stand-in for the adaptive ODE solver of the paper.

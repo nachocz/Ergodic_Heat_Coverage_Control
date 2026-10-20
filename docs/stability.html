@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stability analysis · Ergodic Heat Coverage Control</title>
     <link rel="icon" href="img/icon.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="vendor/katex/katex.min.css">
+    <link rel="stylesheet" href="vendor/katex/katex.inline.min.css">
     <link rel="stylesheet" href="css/app.css">
     <script src="vendor/katex/katex.min.js"></script>
-    <script type="module" src="js/pages/stability.js"></script>
+    <script src="js/dist/stability.js" defer></script>
 </head>
 <body>
     <header class="topbar">
@@ -28,10 +28,10 @@
         <aside class="lesson" aria-label="Lesson">
             <p class="kicker">3 · Stability analysis · Sec. V</p>
             <h1>Why the error stays bounded</h1>
-            <p class="lesson-intro">Section V shows that the closed loop of the heat equation, the ergodic controller, and the standoff controller drives <span class="tex">\norm{e(\cdot,t)}_{L^2(\ROI)}</span> to a bounded neighbourhood of zero. The argument has three steps. The workspace animates them on the one-dimensional loop of Fig. 5.</p>
+            <p class="lesson-intro">Section V shows that the closed loop of the heat equation, the ergodic controller, and the standoff controller drives <span class="tex">\norm{e(\cdot,t)}_{L^2(\ROI)}</span> to a bounded neighbourhood of zero. The argument has three steps. The workspace animates them on the one-dimensional loop of Fig. 4.</p>
 
             <section class="lesson-block">
-                <p class="lesson-kicker">The 1D loop of Fig. 5</p>
+                <p class="lesson-kicker">The 1D loop of Fig. 4</p>
                 <p>On <span class="tex">\Omega=[0,1]</span> with <span class="tex">\ROI=[0.2,0.6]</span>, the source heats every point of <span class="tex">\ROI</span> at once, in proportion to the deficit, and the gate is the only state left to the controller:</p>
                 <div class="tex-block" data-eq="27">\qin(\vx,t)=g(t)\,k_p\,e_+(\vx,t),\qquad \dot g=k_I\,\ebar,\quad g\in[0,1]</div>
                 <p>The run has five 20 s regimes: start-up, a hot disturbance <span class="tex">\Dext=+18</span> °C/s, recovery, a cold disturbance <span class="tex">-18</span> °C/s, and recovery. The step of <span class="tex">\Ts</span> at <span class="tex">x=0.3</span> is sharper than diffusion can hold.</p>
@@ -79,7 +79,7 @@
                     <li>In <b>Step 1</b>, compare <span class="tex">|\ROI|^{1/2}|\ebar|</span>, which the gate drives to zero, with <span class="tex">\norm{e^\perp}</span>, which stays bounded; without disturbances, it stays at the floor set by the step of <span class="tex">\Ts</span>.</li>
                     <li>In <b>Step 2</b>, watch the state slide down <span class="tex">V(g)</span>. Move the start gate <span class="tex">g(0)</span>: every start reaches the same <span class="tex">g^\star</span>.</li>
                     <li>In <b>Step 3</b>, switch the disturbances off and set the sweep period to <span class="tex">\tau_{\mathrm{erg}}=0.2</span> s, then 0.5 s: <span class="tex">g</span> no longer converges to <span class="tex">g^\star</span> but settles in a band, within the bounds (37)–(38). As <span class="tex">\tau_{\mathrm{erg}}</span> approaches <span class="tex">\tau_{\mathrm{th}}\approx1.8</span> s, the residual grows and the gate saturates at 1: the time-scale separation no longer holds.</li>
-                    <li>Set <span class="tex">k_I=20</span>: the discrete loop sustains a limit cycle, the continuous loop converges. <b>Compare the four cases</b> reproduces the bottom row of Fig. 5.</li>
+                    <li>Set <span class="tex">k_I=20</span>: the discrete loop sustains a limit cycle, the continuous loop converges. <b>Compare the four cases</b> reproduces the bottom row of Fig. 4.</li>
                 </ol>
             </section>
 

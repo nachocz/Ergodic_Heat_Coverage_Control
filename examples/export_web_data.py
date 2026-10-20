@@ -2,6 +2,7 @@
 the web pages, resampled to the simulation grid (100 x 100) as base64 float32 arrays.
 
     python examples/export_web_data.py
+    python tools/build_web.py           # docs/data/fields.js, the copy that the pages load
 """
 import base64
 import json
@@ -18,9 +19,9 @@ from ehcc.surface import Surface  # noqa: E402
 N = 100
 LABELS = {
     "T4": "T4 · dignity (Fig. 2)", "T1": "T1 · strokes", "T2": "T2 · disc and arc", "T3": "T3 · frame and dot",
-    "T5": "T5 · nested squares", "interleaved": "Interleaved plateau (Fig. 9)", "sole_3d": "Sole (3D trial, Fig. 16)",
+    "T5": "T5 · nested squares", "interleaved": "Interleaved plateau (Fig. 8)", "sole_3d": "Sole (3D trial, Fig. 15)",
 }
-RUBBER = {"lam": 1.2e-4, "kappa": 0.03}      # material maps of T5 and Fig. 9
+RUBBER = {"lam": 1.2e-4, "kappa": 0.03}      # material maps of T5 and Fig. 8
 METAL = {"lam": 2.4e-4, "kappa": 0.08}
 
 

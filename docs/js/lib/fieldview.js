@@ -107,7 +107,7 @@ export class FieldView {
         const poly = (pts) => { ctx.beginPath(); pts.forEach(([x, y], i) => (i ? ctx.lineTo(X(x), Y(y)) : ctx.moveTo(X(x), Y(y)))); };
         ctx.lineCap = 'round'; ctx.lineJoin = 'round';
 
-        if (o.section) {                             // a section line with viewing arrows (Fig. 4)
+        if (o.section) {                             // a section line
             ctx.strokeStyle = o.section.color || '#e08a2e'; ctx.lineWidth = 2;
             poly([[0.02, o.section.y], [0.98, o.section.y]]); ctx.stroke();
         }

@@ -5,6 +5,18 @@ import { renderMath } from './math.js';
 import { initMusic } from './music.js';
 import { initTheme, toggleTheme } from './theme.js';
 
+// A host that serves the pages in a sandboxed origin (e.g., anonymous.4open.science)
+// blocks downloads; there, the links to files open them in a new tab instead.
+function openDownloadsInTabs() {
+    if (window.origin !== 'null' || location.protocol === 'file:') return;
+    for (const link of document.querySelectorAll('a[download]')) {
+        link.removeAttribute('download');
+        link.target = '_blank';
+        link.rel = 'noopener';
+        link.textContent = link.textContent.replace(/^Download/, 'Open');
+    }
+}
+
 export async function initPage() {
     if (enterPlayer()) await new Promise(() => {});        // reloading inside player.html
     syncPlayer();
@@ -16,16 +28,27 @@ export async function initPage() {
     for (const link of document.querySelectorAll('.topbar-nav a')) {
         if (link.getAttribute('href') === page) link.setAttribute('aria-current', 'page');
     }
+    openDownloadsInTabs();
     renderMath(document);
 }
 
 let fields = null;
-// Targets, material layouts, and the scanned surface (docs/data/fields.json).
+// Targets, material layouts, and the scanned surface: docs/data/fields.json, loaded
+// as the script docs/data/fields.js (a fetch would fail on sandboxed hosts and on
+// file:// addresses).
 export async function loadFields() {
     if (!fields) {
         const { decodeFields } = await import('../sim/ehcc.js');
-        const response = await fetch('data/fields.json');
-        fields = decodeFields(await response.json());
+        if (!window.EHCC_FIELDS) {
+            await new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = 'data/fields.js';
+                script.onload = resolve;
+                script.onerror = () => reject(new Error('data/fields.js could not be loaded'));
+                document.head.append(script);
+            });
+        }
+        fields = decodeFields(window.EHCC_FIELDS);
     }
     return fields;
 }

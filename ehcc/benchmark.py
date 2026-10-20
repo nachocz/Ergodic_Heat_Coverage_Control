@@ -1,5 +1,5 @@
 """Simulation benchmark of Sec. VI: EHCC, its two ablations, and three literature baselines
-on the same plant (Tables I-III, Figs. 7-9).
+on the same plant (Tables I-III, Figs. 6-8).
 
 Every run lasts 10 000 steps of 0.2 s, with a hot pulse (+600 W, 16:40-17:00) and a cold
 sink (-600 W, 26:40-27:40) centred at (0.45, 0.65). Methods:

@@ -48,7 +48,7 @@ class Surface:
 
     @classmethod
     def scanned_sole(cls, N: int = 100) -> "Surface":
-        """Height field reconstructed from the RGB-D depth points of the 3D sole trial (Sec. VII, Fig. 16)."""
+        """Height field reconstructed from the RGB-D depth points of the 3D sole trial (Sec. VII, Fig. 15)."""
         return cls.load(os.path.join(ASSETS, "surfaces", "sole_3d_surface.npz"), N, name="sole_3d")
 
     @classmethod

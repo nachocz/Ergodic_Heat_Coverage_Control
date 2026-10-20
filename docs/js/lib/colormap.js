@@ -1,9 +1,9 @@
 // Colour maps of the paper figures as 256-entry RGB tables:
 //   hot     temperature T and T* (matplotlib "hot")
 //   rdbu    error e = T* - T, red = heat deficit, blue = over-heated (matplotlib "RdBu_r")
-//   need    heating density Phi ~ e_+ (Fig. 4)
+//   need    heating density Phi ~ e_+
 //   viridis height of the surface
-//   metal   material layout: rubber blue, metal red (Fig. 9)
+//   metal   material layout: rubber blue, metal red (Fig. 8)
 
 function fromStops(stops) {                     // stops: [[t, '#rrggbb'], ...]
     const lut = new Uint8ClampedArray(256 * 3);

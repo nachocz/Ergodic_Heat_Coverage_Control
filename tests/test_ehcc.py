@@ -105,7 +105,7 @@ class Stability(unittest.TestCase):
         self.assertTrue(np.all(np.diff(values) < 0))
 
     def test_regime_equilibria_of_fig5(self):
-        """g*_r = 0.31 (no disturbance), 0.03 (hot), 0.66 (cold), as in the caption of Fig. 5."""
+        """g*_r = 0.31 (no disturbance), 0.03 (hot), 0.66 (cold), as in the caption of Fig. 4."""
         for A, expected in ((0.0, 0.31), (18.0, 0.03), (-18.0, 0.66)):
             g = self.loop.equilibrium_gate(self.loop.regime_disturbance(A))
             self.assertAlmostEqual(g, expected, delta=0.005)

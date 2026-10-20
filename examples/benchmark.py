@@ -6,7 +6,7 @@ interleaved heterogeneity case (Table III).
     python examples/benchmark.py --force                  run again even if saved
 
 Each run is saved to outputs/benchmark/<target>/<method>.npz and reused by
-figures/fig7_fig8_benchmark.py and figures/fig9_interleaved.py. The computation
+figures/fig6_fig7_benchmark.py and figures/fig8_interleaved.py. The computation
 times (Cost columns) depend on the machine.
 """
 import argparse

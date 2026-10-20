@@ -1,9 +1,9 @@
-"""Fig. 6: ergodic metric E(t) (14) of EHCC on target T3 under a hot (+1200 W) and a cold
+"""Fig. 5: ergodic metric E(t) (14) of EHCC on target T3 under a hot (+1200 W) and a cold
 (-1200 W) disturbance, for ablations of the baseline parameters (P, h, lambda, k_I).
 The inset zooms on the second half, with dotted lines at 2 E_0 (E_0: 90th percentile of
 E(t) over the second half).
 
-    python figures/fig6_ablation.py      writes outputs/figures/fig6_ablation.pdf (and .png), about 1 min
+    python figures/fig5_ablation.py      writes outputs/figures/fig5_ablation.pdf (and .png), about 1 min
 
 Setup of this study: T3 scaled to [20, 98] degC, lambda = 1.2e-4, coupling 0.1 outside
 Omega_ROI, k_I = 0.004, and the other parameters of the benchmark. The ablation labelled
@@ -115,8 +115,8 @@ def main():
     fig.subplots_adjust(left=0.07, right=0.985, bottom=0.20, top=0.97)
     os.makedirs(OUT, exist_ok=True)
     for ext in ("pdf", "png"):
-        fig.savefig(os.path.join(OUT, f"fig6_ablation.{ext}"))
-    print(f"written: {OUT}/fig6_ablation.pdf and .png")
+        fig.savefig(os.path.join(OUT, f"fig5_ablation.{ext}"))
+    print(f"written: {OUT}/fig5_ablation.pdf and .png")
 
 
 if __name__ == "__main__":

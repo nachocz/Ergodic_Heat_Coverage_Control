@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ergodic Heat Coverage Control</title>
     <meta name="description" content="Interactive companion to the paper Ergodic Heat Coverage Control: Model-Free Robotic Regulation of Temperature Distributions.">
-    <link rel="stylesheet" href="vendor/katex/katex.min.css">
+    <link rel="stylesheet" href="vendor/katex/katex.inline.min.css">
     <link rel="icon" href="img/icon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="css/app.css">
     <script src="vendor/katex/katex.min.js"></script>
-    <script type="module" src="js/pages/landing.js"></script>
+    <script src="js/dist/landing.js" defer></script>
 </head>
 <body>
     <header class="topbar">
@@ -95,7 +95,7 @@
                     <canvas id="preview3" aria-hidden="true"></canvas>
                     <div class="page-card-body">
                         <div class="page-card-top"><span class="page-index">03</span><h3>Stability analysis</h3></div>
-                        <p>The idealized 1D loop of Fig. 5 and the three steps of Sec. V: reduction to the mean error, ideal convergence of the gate, and ultimate boundedness; then the discrete bound on the gain.</p>
+                        <p>The idealized 1D loop of Fig. 4 and the three steps of Sec. V: reduction to the mean error, ideal convergence of the gate, and ultimate boundedness; then the discrete bound on the gain.</p>
                         <div class="concepts"><span class="concept">ē_ss(g)</span><span class="concept">V(g)</span><span class="concept">GUUB</span><span class="concept">k_I bound</span></div>
                     </div>
                 </a>
@@ -106,12 +106,12 @@
             <div class="section-heading"><h2 id="codeHeading">Code</h2><p>Python reference implementation, and these pages</p></div>
             <div class="two-col">
                 <div class="prose">
-                    <p>The package <code>ehcc/</code> implements the thermal plant (2)–(4), the ergodic controller (9)–(16), the standoff controller (17)–(24), the surface frame (5), the five controllers of the simulation benchmark, and the 1D loop of Sec. V, with the parameters of the benchmark. The scripts in <code>figures/</code> and <code>examples/benchmark.py</code> generate the simulation figures (Figs. 4–9) and Tables II–III.</p>
+                    <p>The package <code>ehcc/</code> implements the thermal plant (2)–(4), the ergodic controller (9)–(16), the standoff controller (17)–(24), the surface frame (5), the five controllers of the simulation benchmark, and the 1D loop of Sec. V, with the parameters of the benchmark. The scripts in <code>figures/</code> and <code>examples/benchmark.py</code> generate the simulation figures (Figs. 4–8) and Tables II–III.</p>
 <pre class="code-block">pip install -r requirements.txt
 python examples/run_2d.py          # T4 "dignity", hot and cold disturbances
 python examples/run_3d.py          # scanned sole surface (Sec. VII)
 python examples/benchmark.py       # Tables II and III (six methods)
-python figures/fig5_ki_comparison.py   # Fig. 5; figures/ has Figs. 4-9
+python figures/fig4_ki_comparison.py   # Fig. 4; figures/ has Figs. 4-8
 python -m unittest discover tests</pre>
                 </div>
                 <div class="prose">

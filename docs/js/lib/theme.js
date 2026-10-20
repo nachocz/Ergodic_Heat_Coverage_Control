@@ -1,9 +1,19 @@
 // Light / dark theme, and the colour palette read from the CSS variables, so that
-// canvases, the 3D view, and HTML share one set of colours.
+// canvases, the 3D view, and HTML share one set of colours. The choice is saved
+// in localStorage and, inside player.html, also kept by the player, which passes
+// it to each page (sandboxed hosts give no localStorage).
+import { fromPage, fromPlayer, inFrame, toPage, toPlayer } from './bridge.js';
 
 const KEY = 'ehcc-theme';
 const listeners = new Set();
 let cached = null;
+
+function setTheme(theme) {
+    if ((theme !== 'dark' && theme !== 'light') || document.documentElement.dataset.theme === theme) return;
+    document.documentElement.dataset.theme = theme;
+    cached = null;
+    listeners.forEach((fn) => fn());
+}
 
 export function initTheme() {
     let saved = null;
@@ -11,14 +21,23 @@ export function initTheme() {
     const system = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     document.documentElement.dataset.theme = saved || system;
     cached = null;
+    if (inFrame()) {
+        fromPlayer('theme', ({ theme }) => setTheme(theme));
+        toPlayer('theme-hello');
+    }
 }
 
 export function toggleTheme() {
     const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-    document.documentElement.dataset.theme = next;
+    setTheme(next);
     try { localStorage.setItem(KEY, next); } catch { /* storage unavailable */ }
-    cached = null;
-    listeners.forEach((fn) => fn());
+    toPlayer('theme', { theme: next });
+}
+
+// Player side: keep the theme of the pages loaded in `frame`.
+export function serveTheme(frame) {
+    fromPage(frame, 'theme', ({ theme }) => setTheme(theme));
+    fromPage(frame, 'theme-hello', () => toPage(frame, 'theme', { theme: document.documentElement.dataset.theme }));
 }
 
 export function onThemeChange(fn) { listeners.add(fn); }
