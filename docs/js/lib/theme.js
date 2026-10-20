@@ -1,7 +1,8 @@
 // Light / dark theme, and the colour palette read from the CSS variables, so that
 // canvases, the 3D view, and HTML share one set of colours. The choice is saved
 // in localStorage and, inside player.html, also kept by the player, which passes
-// it to each page (sandboxed hosts give no localStorage).
+// it to each page. Sandboxed hosts give neither; there, the links between the
+// pages carry it (?theme=, js/lib/shell.js).
 import { fromPage, fromPlayer, inFrame, toPage, toPlayer } from './bridge.js';
 
 const KEY = 'ehcc-theme';
@@ -16,8 +17,11 @@ function setTheme(theme) {
 }
 
 export function initTheme() {
-    let saved = null;
-    try { saved = localStorage.getItem(KEY); } catch { /* storage unavailable */ }
+    let saved = new URLSearchParams(location.search).get('theme');
+    if (saved !== 'dark' && saved !== 'light') {
+        saved = null;
+        try { saved = localStorage.getItem(KEY); } catch { /* storage unavailable */ }
+    }
     const system = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     document.documentElement.dataset.theme = saved || system;
     cached = null;

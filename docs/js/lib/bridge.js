@@ -9,6 +9,12 @@ const TAG = 'ehcc';
 // True if this page runs in a frame (normally the frame of player.html).
 export const inFrame = () => window.parent !== window;
 
+// True on hosts that serve every document in its own sandboxed origin (e.g.,
+// anonymous.4open.science). There, a page cannot be shown in the frame of
+// player.html (X-Frame-Options: SAMEORIGIN never matches an opaque origin), so the
+// pages run on their own. file:// addresses also have an opaque origin, but frames work.
+export const sandboxed = () => window.origin === 'null' && location.protocol !== 'file:';
+
 // Page side.
 export function toPlayer(type, data = {}) {
     if (inFrame()) window.parent.postMessage({ [TAG]: type, ...data }, '*');

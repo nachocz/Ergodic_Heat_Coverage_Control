@@ -38,6 +38,10 @@ export function createMusicEngine() {
         const saved = JSON.parse(load(POSITION) || 'null');
         if (saved && Number.isInteger(saved.track) && TRACKS[saved.track]) { track = saved.track; startAt = saved.time || 0; }
     } catch { /* ignore */ }
+    // On sandboxed hosts, the link from the previous page carries the music that was
+    // playing (?music=<track>-<seconds>, js/lib/shell.js): it continues here.
+    const carried = /^(\d+)-(\d+(?:\.\d+)?)$/.exec(new URLSearchParams(location.search).get('music') || '');
+    if (carried && TRACKS[Number(carried[1])]) { track = Number(carried[1]); startAt = Number(carried[2]); }
 
     const notify = () => listeners.forEach((fn) => { try { fn(); } catch { listeners.delete(fn); } });
     function setTrack(time = 0) {
@@ -86,6 +90,7 @@ export function createMusicEngine() {
         get blocked() { return blocked; },
         get playing() { return !audio.paused; },
         get title() { return TRACKS[track].title; },
+        get position() { return { track, time: audio.currentTime || startAt }; },
         toggle() {
             on = !on;
             if (on) {
@@ -113,6 +118,7 @@ export function createMusicEngine() {
         },
         subscribe(fn) { listeners.add(fn); return () => listeners.delete(fn); },
     };
+    if (carried) engine.toggle();                 // if the browser blocks it, it starts at the first click
     return engine;
 }
 
@@ -179,4 +185,5 @@ export function initMusic(button) {
     const unsubscribe = engine.subscribe(sync);
     window.addEventListener('pagehide', unsubscribe);   // the player outlives this page
     sync();
+    return engine;
 }

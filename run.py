@@ -4,7 +4,7 @@
     python run.py --port 9000     another port (a free port is used if it is taken)
     python run.py --no-browser
     python run.py --sandbox       serve the pages as anonymous.4open.science does: every document
-                                  in a sandboxed origin, without CORS headers
+                                  in a sandboxed origin, without CORS headers, not shown in frames
 
 The pages are static files; any web server for the docs/ folder works as well,
 e.g. GitHub Pages, and docs/index.html also opens directly from the disk.
@@ -33,6 +33,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self) -> None:
         if self.sandbox:
             self.send_header("Content-Security-Policy", "sandbox allow-scripts allow-popups allow-forms allow-modals")
+            self.send_header("X-Frame-Options", "SAMEORIGIN")
         super().end_headers()
 
     def log_message(self, *args) -> None:      # quiet console
