@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ergodic Heat Coverage Control</title>
+    <meta name="description" content="Interactive companion to the paper Ergodic Heat Coverage Control: Model-Free Robotic Regulation of Temperature Distributions.">
+    <link rel="stylesheet" href="vendor/katex/katex.min.css">
+    <link rel="icon" href="img/icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="css/app.css">
+    <script src="vendor/katex/katex.min.js"></script>
+    <script type="module" src="js/pages/landing.js"></script>
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">EH</span>Ergodic Heat Coverage Control</a>
+        <nav class="topbar-nav" aria-label="Pages">
+            <a href="index.html">Overview</a>
+            <a href="problem.html"><span class="nav-num">1</span>Problem setup</a>
+            <a href="control.html"><span class="nav-num">2</span>Control demo</a>
+            <a href="stability.html"><span class="nav-num">3</span>Stability</a>
+        </nav>
+        <span class="topbar-spacer"></span>
+        <button class="button icon-button" type="button" data-cite title="Cite the paper" aria-label="Cite the paper">❝</button>
+        <button id="musicButton" class="button icon-button music-button" type="button" aria-pressed="false" aria-label="Background music" title="Background music">♪</button>
+        <button id="themeButton" class="button icon-button" type="button" title="Switch light / dark theme" aria-label="Switch theme">◐</button>
+    </header>
+
+    <main class="landing">
+        <div class="hero-grid">
+            <section class="hero">
+                <p class="kicker">Interactive companion to the paper</p>
+                <h1>Ergodic Heat Coverage Control: Model-Free Robotic Regulation of Temperature Distributions</h1>
+                <p>A robot-mounted heat source has to drive the temperature field <span class="tex">T(\vx,t)</span> of a material surface to a target distribution <span class="tex">\Ts(\vx)</span> on a region of interest <span class="tex">\ROI</span>. The thermal properties of the material, its boundary conditions, and its losses to the environment are unknown; the only feedback is the measured temperature field.</p>
+                <p>Ergodic Heat Coverage Control (EHCC) closes the loop on the measured error <span class="tex">e=\Ts-T</span> with two decoupled controllers. An ergodic coverage controller moves the focal point <span class="tex">\vp(t)</span> so that the time-averaged heat footprint matches the current heat deficit <span class="tex">e_+</span>, which is recomputed at every instant. A standoff controller sets the source-to-surface distance <span class="tex">d(t)</span>, and with it the injected power, through an integral law on the mean error <span class="tex">\ebar</span>. The stability analysis reduces the closed loop to a scalar equation for the standoff gate and establishes global uniform ultimate boundedness (GUUB) of the error.</p>
+                <p>These pages illustrate the problem, run the closed loop in 2D and on 3D surfaces (including the surface scanned in the experiments), and animate the three steps of the stability analysis. The simulations run in the browser, with a JavaScript port of the Python package of this repository.</p>
+                <div class="hero-actions">
+                    <a class="button" href="problem.html"><span class="hero-action-icon" aria-hidden="true">1</span>Problem setup</a>
+                    <a class="button" href="control.html"><span class="hero-action-icon" aria-hidden="true">2</span>Control demo</a>
+                    <a class="button" href="stability.html"><span class="hero-action-icon" aria-hidden="true">3</span>Stability</a>
+                    <button class="button" type="button" data-cite><span class="hero-action-icon" aria-hidden="true">❝</span>Cite the paper</button>
+                </div>
+                <div class="loop-strip">
+                    <span class="loop-chip">error <span class="tex">e=\Ts-T</span></span>
+                    <span class="loop-chip">heating density <span class="tex">\Phi\propto e_+</span></span>
+                    <span class="loop-chip">tangential <span class="tex">\vu_\tau=-K_g\nabla_{\vp}\E</span></span>
+                    <span class="loop-chip">standoff <span class="tex">d\in[\dlb(t),\dmax]</span></span>
+                </div>
+            </section>
+            <figure class="paper-figure">
+                <div class="paper-figure-panel">
+                    <img src="img/fig1_overview.jpg" width="1164" height="1400" alt="Top: a robot with a mounted heat gun heats unmodeled heterogeneous materials while a second arm holds the thermal and 3D sensor. Bottom: the target temperature profile and the current profile give the error profile (blue: heat-deficient regions, red: over-heated regions), which drives the closed-loop control of the SE(3) robot trajectory.">
+                </div>
+                <figcaption><b>Fig. 1 of the paper.</b> General summary of the EHCC framework. The system computes a spatial error profile by comparing the sensed surface temperature <span class="tex">T</span> against the target distribution <span class="tex">\Ts</span>. Targeting heat-deficient regions, EHCC generates <span class="tex">SE(3)</span> trajectories for a robot-mounted heat source, with real-time thermal and 3D geometric feedback.</figcaption>
+            </figure>
+        </div>
+
+        <section class="section" aria-labelledby="videoHeading">
+            <div class="section-heading"><h2 id="videoHeading">Video</h2><p>experiments on aluminium, foam, and rubber, with hot and cold disturbances</p></div>
+            <div class="video-grid">
+                <div class="video-frame">
+                    <iframe src="https://www.youtube-nocookie.com/embed/wSFeCXYk3CU" title="Ergodic Heat Coverage Control: supplementary video" loading="lazy"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                </div>
+                <div class="prose">
+                    <p>The video shows the trials of the experimental validation: a heat gun on a 7-DoF arm, an RGB-D camera that measures the temperature through a thermochromic coating (25–31 °C), and targets on aluminium, foam, rubber soles, and a curved 3D surface. In every trial the controller gains are the same and no thermal parameter is calibrated.</p>
+                    <p>Hot and cold disturbances (a hair dryer) are applied during selected trials; the standoff lower bound <span class="tex">\dlb(t)</span> rises after a hot disturbance and drops after a cold one, as in the control demo.</p>
+                    <p><a href="https://youtu.be/wSFeCXYk3CU" target="_blank" rel="noopener">Open the video on YouTube ↗</a></p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" aria-labelledby="pagesHeading">
+            <div class="section-heading"><h2 id="pagesHeading">Interactive pages</h2><p>in the order of the paper</p></div>
+            <div class="card-grid">
+                <a class="page-card" href="problem.html">
+                    <canvas id="preview1" aria-hidden="true"></canvas>
+                    <div class="page-card-body">
+                        <div class="page-card-top"><span class="page-index">01</span><h3>Problem setup and notation</h3></div>
+                        <p>The surface and its region of interest, the target, the error, the heat equation, the actuation model, and the surface-aligned frame. Heat the surface by hand.</p>
+                        <div class="concepts"><span class="concept">Ω_ROI from T*</span><span class="concept">e = T* − T</span><span class="concept">q_in = P η(d) K</span><span class="concept">R_s = [t1, t2, n]</span></div>
+                    </div>
+                </a>
+                <a class="page-card" href="control.html">
+                    <canvas id="preview2" aria-hidden="true"></canvas>
+                    <div class="page-card-body">
+                        <div class="page-card-top"><span class="page-index">02</span><h3>Control demo</h3></div>
+                        <p>The closed loop in 2D and on 3D surfaces. Choose the target, the surface (also the scanned one), uniform or heterogeneous materials, and the gains; add hot and cold disturbances.</p>
+                        <div class="concepts"><span class="concept">ergodic coverage</span><span class="concept">standoff d(t)</span><span class="concept">d_lb(t)</span><span class="concept">disturbances</span></div>
+                    </div>
+                </a>
+                <a class="page-card" href="stability.html">
+                    <canvas id="preview3" aria-hidden="true"></canvas>
+                    <div class="page-card-body">
+                        <div class="page-card-top"><span class="page-index">03</span><h3>Stability analysis</h3></div>
+                        <p>The idealized 1D loop of Fig. 5 and the three steps of Sec. V: reduction to the mean error, ideal convergence of the gate, and ultimate boundedness; then the discrete bound on the gain.</p>
+                        <div class="concepts"><span class="concept">ē_ss(g)</span><span class="concept">V(g)</span><span class="concept">GUUB</span><span class="concept">k_I bound</span></div>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <section class="section" aria-labelledby="codeHeading">
+            <div class="section-heading"><h2 id="codeHeading">Code</h2><p>Python reference implementation, and these pages</p></div>
+            <div class="two-col">
+                <div class="prose">
+                    <p>The package <code>ehcc/</code> implements the thermal plant (2)–(4), the ergodic controller (9)–(16), the standoff controller (17)–(24), the surface frame (5), and the 1D loop of Sec. V, with the parameters of the simulation benchmark. Its tests reproduce the EHCC row of Table II for target T4 and the equilibria of Fig. 5.</p>
+<pre class="code-block">pip install -r requirements.txt
+python examples/run_2d.py          # T4 "dignity", hot and cold disturbances
+python examples/run_3d.py          # scanned sole surface (Sec. VII)
+python examples/stability_1d.py    # Fig. 5
+python examples/benchmark.py       # metrics of Tables II and III
+python -m unittest discover tests</pre>
+                </div>
+                <div class="prose">
+                    <p>The pages are static files (HTML, CSS, and JavaScript, with KaTeX and three.js included), so they run on any web server. To open them locally:</p>
+<pre class="code-block">python run.py                      # http://127.0.0.1:8765</pre>
+                    <p>The browser simulation is a line-by-line port of the package; <code>tests/test_web_parity.py</code> runs it with Node.js and checks that both give the same logs.</p>
+                </div>
+            </div>
+        </section>
+
+        <p class="footer">Background music (optional, ♪ in the top bar): calm piano pieces by Erik Satie (public-domain recordings) and Kevin MacLeod (incompetech.com, CC BY 4.0), see <a href="audio/CREDITS.md">credits</a>. Equations typeset with KaTeX and 3D views drawn with three.js (both MIT license).</p>
+    </main>
+</body>
+</html>

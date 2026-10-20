@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ergodic Heat Coverage Control</title>
+    <link rel="icon" href="img/icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="css/app.css">
+    <style>
+        html, body { height: 100%; overflow: hidden; }
+        #app { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; background: var(--bg); }
+    </style>
+    <script type="module">
+        // One music engine for the whole visit; the pages load in the frame, so that
+        // moving between them does not interrupt the music.
+        import { createMusicEngine } from './js/lib/music.js';
+        import { initTheme } from './js/lib/theme.js';
+        initTheme();
+        window.addEventListener('storage', (event) => { if (event.key === 'ehcc-theme') initTheme(); });
+        window.ehccMusic = createMusicEngine();
+        const frame = document.getElementById('app');
+        const requested = new URLSearchParams(location.search).get('p') || '';
+        // Only the pages of this site are loaded in the frame.
+        frame.src = /^(index|problem|control|stability)\.html(\?[\w=&.-]*)?(#[\w-]*)?$/.test(requested) ? requested : 'index.html';
+        frame.addEventListener('load', () => { try { frame.contentWindow.focus(); } catch { /* ignore */ } });
+    </script>
+</head>
+<body>
+    <iframe id="app" title="Ergodic Heat Coverage Control, interactive companion" allow="fullscreen; autoplay; encrypted-media; picture-in-picture"></iframe>
+</body>
+</html>

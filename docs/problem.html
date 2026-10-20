@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Problem setup · Ergodic Heat Coverage Control</title>
+    <link rel="icon" href="img/icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="vendor/katex/katex.min.css">
+    <link rel="stylesheet" href="css/app.css">
+    <script src="vendor/katex/katex.min.js"></script>
+    <script type="module" src="js/pages/problem.js"></script>
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">EH</span>Ergodic Heat Coverage Control</a>
+        <nav class="topbar-nav" aria-label="Pages">
+            <a href="index.html">Overview</a>
+            <a href="problem.html"><span class="nav-num">1</span>Problem setup</a>
+            <a href="control.html"><span class="nav-num">2</span>Control demo</a>
+            <a href="stability.html"><span class="nav-num">3</span>Stability</a>
+        </nav>
+        <span class="topbar-spacer"></span>
+        <button class="button icon-button" type="button" data-cite title="Cite the paper" aria-label="Cite the paper">❝</button>
+        <button id="musicButton" class="button icon-button music-button" type="button" aria-pressed="false" aria-label="Background music" title="Background music">♪</button>
+        <button id="themeButton" class="button icon-button" type="button" title="Switch light / dark theme" aria-label="Switch theme">◐</button>
+    </header>
+    <div class="demo-layout">
+        <aside class="lesson" aria-label="Lesson">
+            <p class="kicker">1 · Problem setup and notation · Sec. II</p>
+            <h1>The temperature regulation problem</h1>
+            <p class="lesson-intro">A single heat source, moved by a robot over a surface, has to bring the temperature field to a target distribution on a region of interest. This page introduces the quantities of the problem; in the workspace, you move the heat source by hand.</p>
+
+            <section class="lesson-block">
+                <p class="lesson-kicker">Surface and region of interest</p>
+                <p>The surface is a 2D manifold parametrized over <span class="tex">\Omega=[0,1]^2</span> and embedded in the workspace by <span class="tex">\vs:\Omega\to\R^3</span>. The task is defined on <span class="tex">\ROI\subseteq\Omega</span>, given by its indicator <span class="tex">\chiROI</span>. Here, as in the code, <span class="tex">\ROI</span> is the set where the target is above ambient:</p>
+                <div class="tex-block">\ROI=\{\vx\in\Omega:\ \Ts(\vx)&gt;\Tamb\}.</div>
+                <p>Its boundary <span class="tex">\partial\ROI</span> is the dotted teal line in every view.</p>
+            </section>
+
+            <section class="lesson-block">
+                <p class="lesson-kicker">Temperature, target, and error</p>
+                <div class="tex-block" data-eq="1">e(\vx,t)=\Ts(\vx)-T(\vx,t),\qquad \vx\in\ROI.</div>
+                <p>The objective is to minimize <span class="tex">\norm{e(\cdot,t)}_{L^2(\ROI)}</span>. The source can only add heat, so the controller separates the heat deficit</p>
+                <div class="tex-block" data-eq="9">e_+(\vx,t)=\max\{e(\vx,t),0\}\ \text{on}\ \ROI,\quad 0\ \text{elsewhere},</div>
+                <p>(red in the error map) from the over-heated regions (blue).</p>
+            </section>
+
+            <section class="lesson-block">
+                <p class="lesson-kicker">Heat equation</p>
+                <div class="tex-block" data-eq="2">\frac{\partial T}{\partial t}=\nabla\cdot\big(\alpha(\vx)\nabla T\big)+\lambda(\vx)\big(\qin-\qloss(T)\big)</div>
+                <p><span class="tex">\alpha=\kappa/(c\rho)</span> is the diffusivity, <span class="tex">\lambda=1/(c\rho)</span> the thermal coupling, and <span class="tex">\qloss=h\,(T-\Tamb)</span> the loss to the environment, with Neumann boundaries. These quantities are unknown to the controller: the model is used only to simulate the surface and in the stability analysis.</p>
+            </section>
+
+            <section class="lesson-block">
+                <p class="lesson-kicker">Actuation</p>
+                <div class="tex-block" data-eq="3">\qin(\vx,t)=P\,\eta\big(d(t)\big)\,\K\big(\vx;\vp(t),d(t)\big),\qquad \int_\Omega\K\,d\vx=1</div>
+                <div class="tex-block" data-eq="4">\Qin(t)=\int_{\ROI}\qin\,d\vx=P\,\eta\big(d(t)\big)</div>
+                <p>The source has a constant power <span class="tex">P</span>. The efficiency <span class="tex">\eta(d)</span> decreases with the standoff <span class="tex">d</span> and vanishes at <span class="tex">\dmax</span>, while the width <span class="tex">\sigma(d)</span> of the Gaussian kernel <span class="tex">\K</span> grows with <span class="tex">d</span>. The standoff therefore sets both the injected power and its spread.</p>
+            </section>
+
+            <section class="lesson-block">
+                <p class="lesson-kicker">Robot workspace</p>
+                <div class="tex-block" data-eq="5">\vR(t)=\vR_s\big(\vp(t)\big)=[\vt_1,\ \vt_2,\ \vn]\in SO(3)</div>
+                <div class="tex-block" data-eq="6–8">\vv_s=\begin{bmatrix}\vu_\tau\\u_n\end{bmatrix},\quad \dot{\vp}=\vu_\tau,\quad \dot d=u_n,\quad \vv_{\mathrm{global}}=\vR_s\vv_s</div>
+                <p>The end effector stays aligned with the surface frame (<span class="tex">\vt_1</span> red, <span class="tex">\vt_2</span> green, <span class="tex">\vn</span> blue in the 3D view) at <span class="tex">\vr=\vs(\vp)+d\,\vn</span>. The tangential input <span class="tex">\vu_\tau</span> moves the focal point <span class="tex">\vp</span>, and the normal input <span class="tex">u_n</span> changes the standoff <span class="tex">d</span>. Sections III and IV define the two controllers (control demo).</p>
+            </section>
+
+            <section class="lesson-block">
+                <p class="lesson-kicker">Try this</p>
+                <ol class="missions">
+                    <li>Press and drag on the large map to move the focal point <span class="tex">\vp</span> while the source heats. The heat deficit <span class="tex">e_+</span> shrinks where you pass, and diffusion spreads the heat beyond the footprint.</li>
+                    <li>Scroll on the map, or use the slider, to change <span class="tex">d</span>, and compare <span class="tex">\eta(d)</span> and <span class="tex">\sigma(d)</span> in the actuation plot: close to the surface, the source heats a small spot strongly; at <span class="tex">\dmax</span> it does not heat.</li>
+                    <li>Over-heat a region: <span class="tex">e</span> becomes negative (blue). Only losses and diffusion lower <span class="tex">T</span>; there is no active cooling.</li>
+                    <li>Switch the surface to the scanned sole and follow the frame <span class="tex">\vR_s</span> and the standoff along <span class="tex">\vn</span> in the 3D view.</li>
+                    <li>Click a row of the notation table to show that quantity on the large map.</li>
+                </ol>
+            </section>
+
+            <section class="lesson-block takeaway">
+                <p>To heat a whole distribution with one moving source, the controller must decide where the source goes (<span class="tex">\vp</span>, Sec. III) and how much heat it delivers (<span class="tex">d</span>, Sec. IV), using only the measured error.</p>
+            </section>
+
+            <section class="lesson-block">
+                <p class="lesson-kicker">Notation (App. A)</p>
+                <table class="notation" id="notation">
+                    <thead><tr><th>Symbol</th><th>Meaning</th></tr></thead>
+                    <tbody>
+                        <tr class="group"><td colspan="2">Geometry and thermal field</td></tr>
+                        <tr data-field="Tstar"><td><span class="tex">\Omega,\ \ROI,\ \chiROI</span></td><td>surface domain, region of interest, its indicator</td></tr>
+                        <tr><td><span class="tex">\vs(\vx)</span></td><td>embedding of <span class="tex">\Omega</span> in the workspace (3D view)</td></tr>
+                        <tr data-field="T"><td><span class="tex">T(\vx,t)</span></td><td>measured temperature field</td></tr>
+                        <tr data-field="Tstar"><td><span class="tex">\Ts(\vx)</span></td><td>target temperature distribution</td></tr>
+                        <tr data-field="e"><td><span class="tex">e,\ \ebar</span></td><td>error <span class="tex">\Ts-T</span> on <span class="tex">\ROI</span>, and its spatial mean</td></tr>
+                        <tr data-field="eplus"><td><span class="tex">e_+</span></td><td>heat deficit, positive part of <span class="tex">e</span></td></tr>
+                        <tr class="group"><td colspan="2">Robot motion and heat actuation</td></tr>
+                        <tr><td><span class="tex">\vp(t),\ d(t)</span></td><td>focal point (orange) and standoff</td></tr>
+                        <tr><td><span class="tex">\vR_s=[\vt_1,\vt_2,\vn]</span></td><td>surface-aligned frame at <span class="tex">\vp</span></td></tr>
+                        <tr><td><span class="tex">\vu_\tau,\ u_n</span></td><td>tangential and normal velocity inputs</td></tr>
+                        <tr data-field="K"><td><span class="tex">P,\ \eta(d),\ \K(\vx;\vp,d)</span></td><td>nominal power, efficiency, normalized heat kernel</td></tr>
+                        <tr data-field="K"><td><span class="tex">\qin,\ \Qin</span></td><td>injected heat flux density, total injected power</td></tr>
+                        <tr class="group"><td colspan="2">Thermal model (simulation and analysis only)</td></tr>
+                        <tr><td><span class="tex">\alpha,\ \kappa,\ \lambda</span></td><td>diffusivity, conductivity, thermal coupling</td></tr>
+                        <tr><td><span class="tex">\qloss,\ h,\ \Tamb</span></td><td>environmental loss, convection coefficient, ambient</td></tr>
+                        <tr class="group"><td colspan="2">Ergodic controller (next page)</td></tr>
+                        <tr data-field="Phi"><td><span class="tex">\Phi(\vx,t)</span></td><td>heating density, <span class="tex">\Phi\propto e_+</span> (10)</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <figure class="paper-figure lesson-block">
+                <div class="paper-figure-panel"><img src="img/fig3_heat_model.jpg" width="1100" height="707" alt="A heat gun aligned with the surface frame projects heat with kernel K onto the material surface Omega; the region of interest is bounded by a dotted line; diffusion and losses to the environment act on the surface."></div>
+                <figcaption><b>Fig. 3 of the paper.</b> Physical model of the thermal dynamics on <span class="tex">\Omega</span>: input power density shaped by the kernel <span class="tex">\K</span>, diffusion <span class="tex">\nabla\cdot(\alpha\nabla T)</span>, and losses <span class="tex">\qloss</span>.</figcaption>
+            </figure>
+
+            <div class="lesson-nav">
+                <a class="button" href="index.html">◀ Overview</a>
+                <a class="button primary" href="control.html">Control demo ▶</a>
+            </div>
+        </aside>
+        <main class="workspace" id="workspace"></main>
+    </div>
+</body>
+</html>

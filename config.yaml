@@ -1,0 +1,31 @@
+# EHCC simulation and controller parameters (values of the simulation benchmark, Sec. VI).
+# python examples/run_2d.py --config config.yaml
+# Lengths on the surface are normalized (Omega = [0, 1]^2); domain_size is its side [m].
+dt: 0.2                # time step [s]
+steps: 10000           # 33 min 20 s
+N: 100                 # grid points per axis
+domain_size: 0.35      # [m]
+heater:                # q_in = P eta(d) K(x; p, d)   (3)
+  P: 1200.0            # [W]
+  eta_max: 0.9         # eta(d_min)
+  eta_min: 0.0         # eta(d_max)
+  sigma_min: 0.02      # kernel width at d_min [normalized]
+  sigma_max: 0.04      # kernel width at d_max [normalized]
+  T_source: 150.0      # absorption vanishes at this temperature [degC]
+standoff:              # (18)-(21)
+  d_min: 0.05          # [m]
+  d_max: 0.45          # [m]
+  k_I: 0.04            # [m/(s degC)]; 0.02 for T5 and the interleaved case
+  d_lb0: 0.2           # d_lb(0) [m]; null for d_min
+ergodic:               # (10)-(16)
+  K: 15                # modes per axis
+  s: 1.05              # Sobolev exponent
+  K_g: 0.4             # gain
+  u_max: 0.1           # [domain lengths / s]
+  p0: [0.25, 0.35]     # p(0)
+thermal:               # heat equation (2), simulation only
+  lam: 0.0001          # lambda = 1/(c rho)
+  kappa: 0.1           # alpha = lambda kappa
+  h: 6.0               # q_loss = h (T - T_amb)
+  outside_roi_coupling: 0.4   # insulating backing outside Omega_ROI
+  roi_threshold: 0.01  # Omega_ROI = {T* > T_amb + roi_threshold} [degC]

@@ -1,0 +1,6 @@
+numpy>=1.24
+scipy>=1.10
+matplotlib>=3.7
+pyyaml>=6.0
+# optional, for the live 3D window of examples/run_3d.py --live:
+# open3d>=0.18

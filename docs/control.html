@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control demo · Ergodic Heat Coverage Control</title>
+    <link rel="icon" href="img/icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="vendor/katex/katex.min.css">
+    <link rel="stylesheet" href="css/app.css">
+    <script src="vendor/katex/katex.min.js"></script>
+    <script type="module" src="js/pages/control.js"></script>
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">EH</span>Ergodic Heat Coverage Control</a>
+        <nav class="topbar-nav" aria-label="Pages">
+            <a href="index.html">Overview</a>
+            <a href="problem.html"><span class="nav-num">1</span>Problem setup</a>
+            <a href="control.html"><span class="nav-num">2</span>Control demo</a>
+            <a href="stability.html"><span class="nav-num">3</span>Stability</a>
+        </nav>
+        <span class="topbar-spacer"></span>
+        <button class="button icon-button" type="button" data-cite title="Cite the paper" aria-label="Cite the paper">❝</button>
+        <button id="musicButton" class="button icon-button music-button" type="button" aria-pressed="false" aria-label="Background music" title="Background music">♪</button>
+        <button id="themeButton" class="button icon-button" type="button" title="Switch light / dark theme" aria-label="Switch theme">◐</button>
+    </header>
+    <div class="demo-layout">
+        <aside class="lesson" aria-label="Lesson">
+            <p class="kicker">2 · Control demo · Secs. III–IV</p>
+            <h1>Closing the loop: ergodic coverage and standoff regulation</h1>
+            <p class="lesson-intro">EHCC uses the measured error in two decoupled channels: the ergodic controller decides where the source goes, and the standoff controller decides how much heat it injects. Neither uses the thermal model; the simulation in the workspace does.</p>
+
+            <figure class="paper-figure lesson-block">
+                <div class="paper-figure-panel"><a href="img/fig2_architecture.jpg" target="_blank" rel="noopener" title="Open the full-size figure"><img src="img/fig2_architecture.jpg" width="2200" height="869" alt="Architecture: the error between target and measured temperature feeds the coverage ergodic controller, which outputs the tangential action, and the standoff distance controller, which outputs the normal action; both are mapped to global velocities through the surface frame."></a></div>
+                <figcaption><b>Fig. 2 of the paper.</b> EHCC architecture, with the "dignity" target <span class="tex">\Ts</span> used as default in this demo.</figcaption>
+            </figure>
+
+            <section class="lesson-block">
+                <p class="lesson-kicker">Where to heat: ergodic coverage (Sec. III)</p>
+                <p>The heat deficit defines a target density for the motion of the source, recomputed from the measured error at every instant:</p>
+                <div class="tex-block" data-eq="10">\Phi(\vx,t)=\frac{e_+(\vx,t)}{\int_\Omega e_+(\vx,t)\,d\vx+\epsilon}</div>
+                <p>With the cosine basis <span class="tex">\Psi_{\vk}(\vx)=\cos(k_1\pi x)\cos(k_2\pi y)</span> (11), the controller compares the coefficients of <span class="tex">\Phi</span> with those of the time-averaged trajectory:</p>
+                <div class="tex-block" data-eq="12–13">\phi_{\vk}(t)=\int_\Omega\Phi\,\Psi_{\vk}\,d\vx,\qquad c_{\vk}(t)=\frac1t\int_0^t\Psi_{\vk}\big(\vp(\tau)\big)\,d\tau</div>
+                <div class="tex-block" data-eq="14–15">\E(t)=\sum_{\vk}\Lambda_{\vk}\big(c_{\vk}-\phi_{\vk}\big)^2,\qquad \Lambda_{\vk}=\big(1+\norm{\vk}^2\big)^{-s}</div>
+                <div class="tex-block" data-eq="16">\vu_\tau(t)=-K_g\sum_{\vk}\Lambda_{\vk}\big(c_{\vk}-\phi_{\vk}\big)\nabla_{\vp}\Psi_{\vk}\big(\vp(t)\big)</div>
+                <p>The source therefore spends more time where more heat is missing. The speed is limited to <span class="tex">u_{\max}</span>.</p>
+            </section>
+
+            <section class="lesson-block">
+                <p class="lesson-kicker">How much heat: the standoff (Sec. IV)</p>
+                <p>The local deficit at the focal point, <span class="tex">e_{\vp}(t)=e_+(\vp(t),t)</span> (17), sets the standoff between <span class="tex">\dmax</span> (no deficit, no heating, <span class="tex">\eta(\dmax)\approx0</span>) and the adaptive lower bound <span class="tex">\dlb(t)</span>:</p>
+                <div class="tex-block" data-eq="18">d(t)=\dmax-\frac{\dmax-\dlb(t)}{\emax}\,e_{\vp}(t)</div>
+                <p>The lower bound integrates the mean error over <span class="tex">\ROI</span>, saturated to <span class="tex">[\dmin,\dmax]</span>:</p>
+                <div class="tex-block" data-eq="19, 21">\ebar(t)=\frac{1}{|\ROI|}\int_{\ROI}e\,d\vx,\qquad \dot d_{\mathrm{lb}}=-k_I\,\ebar(t)</div>
+                <p>Both mechanisms act through the gate <span class="tex">g=(\dmax-\dlb)/(\dmax-\dmin)\in[0,1]</span> (22), plotted below: <span class="tex">g=1</span> gives the full heating range, <span class="tex">g=0</span> holds the source at <span class="tex">\dmax</span>. After over-heating (<span class="tex">\ebar&lt;0</span>), <span class="tex">g</span> decreases and the surface cools passively.</p>
+            </section>
+
+            <section class="lesson-block">
+                <p class="lesson-kicker">Try this</p>
+                <ol class="missions">
+                    <li>Press <b>Run</b> with the default setup (target T4, the benchmark schedule of Sec. VI). <span class="tex">\E(t)</span> drops after the first sweeps, and <span class="tex">\ebar(t)</span> settles near zero with a spread <span class="tex">\sigma_e</span> set by diffusion at the edges of the target.</li>
+                    <li>At 16:40 a hot source (+600 W, 20 s) over-heats the surface: <span class="tex">\dlb</span> rises to <span class="tex">\dmax</span> (<span class="tex">g\to0</span>) and the surface cools passively. At 26:40 a cold sink (−600 W, 60 s) does the opposite. Click on the <span class="tex">T</span> map to place your own disturbance, then use the buttons.</li>
+                    <li>Press <b>EHCC-NA</b> (<span class="tex">k_I=0</span> and <span class="tex">\dlb\equiv\dmin</span>, the ablation of Sec. VI-B) and run again: with the full heating range and no integral law, the mean error turns negative (over-heating).</li>
+                    <li>Choose T5 or the interleaved plateau: the domain is heterogeneous (metal and rubber), and the controller receives no information about it.</li>
+                    <li>Choose the sole target of the 3D trial and the scanned surface, and follow the frame <span class="tex">\vR_s</span> along the trajectory in the 3D view.</li>
+                    <li>Change the conductivity <span class="tex">\kappa</span> or the convection <span class="tex">h</span> during a run: the loop compensates without any retuning.</li>
+                </ol>
+            </section>
+
+            <section class="lesson-block takeaway">
+                <p>Coverage sets where the heat goes, and the integral standoff law sets how much heat enters on average; together they hold <span class="tex">\ebar</span> near zero on materials that the controller knows nothing about.</p>
+            </section>
+
+            <details>
+                <summary>Model and parameters of the simulation</summary>
+                <div class="lesson-block">
+                    <p>The plant is the heat equation (2) on a 100 × 100 grid over a 0.35 m square (the scanned surface is 0.47 m), with the actuation model (3)–(4), explicit Euler steps of 0.2 s, and Neumann boundaries. The material outside <span class="tex">\ROI</span> is an insulating backing (coupling reduced to 0.4). The default values are those of the simulation benchmark of Sec. VI: <span class="tex">P=1200</span> W, <span class="tex">\eta\in[0,0.9]</span>, <span class="tex">\sigma\in[0.02,0.04]</span>, <span class="tex">d\in[0.05,0.45]</span> m, <span class="tex">K=15</span>, <span class="tex">s=1.05</span>, <span class="tex">K_g=0.4</span>, <span class="tex">u_{\max}=0.1</span> domain lengths per second, and <span class="tex">k_I=0.04</span> (0.02 for the heterogeneous targets).</p>
+                    <p>The code is a port of the Python package <code>ehcc/</code>; <code>tests/test_web_parity.py</code> checks that both give the same logs, and the tests reproduce the EHCC row of Table II for target T4.</p>
+                </div>
+            </details>
+
+            <div class="lesson-nav">
+                <a class="button" href="problem.html">◀ Problem setup</a>
+                <a class="button primary" href="stability.html">Stability ▶</a>
+            </div>
+        </aside>
+        <main class="workspace" id="workspace"></main>
+    </div>
+</body>
+</html>

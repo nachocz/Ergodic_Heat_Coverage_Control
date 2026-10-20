@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stability analysis · Ergodic Heat Coverage Control</title>
+    <link rel="icon" href="img/icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="vendor/katex/katex.min.css">
+    <link rel="stylesheet" href="css/app.css">
+    <script src="vendor/katex/katex.min.js"></script>
+    <script type="module" src="js/pages/stability.js"></script>
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">EH</span>Ergodic Heat Coverage Control</a>
+        <nav class="topbar-nav" aria-label="Pages">
+            <a href="index.html">Overview</a>
+            <a href="problem.html"><span class="nav-num">1</span>Problem setup</a>
+            <a href="control.html"><span class="nav-num">2</span>Control demo</a>
+            <a href="stability.html"><span class="nav-num">3</span>Stability</a>
+        </nav>
+        <span class="topbar-spacer"></span>
+        <button class="button icon-button" type="button" data-cite title="Cite the paper" aria-label="Cite the paper">❝</button>
+        <button id="musicButton" class="button icon-button music-button" type="button" aria-pressed="false" aria-label="Background music" title="Background music">♪</button>
+        <button id="themeButton" class="button icon-button" type="button" title="Switch light / dark theme" aria-label="Switch theme">◐</button>
+    </header>
+    <div class="demo-layout">
+        <aside class="lesson" aria-label="Lesson">
+            <p class="kicker">3 · Stability analysis · Sec. V</p>
+            <h1>Why the error stays bounded</h1>
+            <p class="lesson-intro">Section V shows that the closed loop of the heat equation, the ergodic controller, and the standoff controller drives <span class="tex">\norm{e(\cdot,t)}_{L^2(\ROI)}</span> to a bounded neighbourhood of zero. The argument has three steps. The workspace animates them on the one-dimensional loop of Fig. 5.</p>
+
+            <section class="lesson-block">
+                <p class="lesson-kicker">The 1D loop of Fig. 5</p>
+                <p>On <span class="tex">\Omega=[0,1]</span> with <span class="tex">\ROI=[0.2,0.6]</span>, the source heats every point of <span class="tex">\ROI</span> at once, in proportion to the deficit, and the gate is the only state left to the controller:</p>
+                <div class="tex-block" data-eq="27">\qin(\vx,t)=g(t)\,k_p\,e_+(\vx,t),\qquad \dot g=k_I\,\ebar,\quad g\in[0,1]</div>
+                <p>The run has five 20 s regimes: start-up, a hot disturbance <span class="tex">\Dext=+18</span> °C/s, recovery, a cold disturbance <span class="tex">-18</span> °C/s, and recovery. The step of <span class="tex">\Ts</span> at <span class="tex">x=0.3</span> is sharper than diffusion can hold.</p>
+            </section>
+
+            <section class="lesson-block">
+                <p class="lesson-kicker">Step 1 · Reduction to the mean error</p>
+                <p>The error splits into its spatial mean and a zero-mean part, <span class="tex">e=\ebar+e^\perp</span>:</p>
+                <div class="tex-block" data-eq="25">\norm{e}_{L^2}^2=|\ROI|\,\ebar^2+\norm{e^\perp}_{L^2}^2</div>
+                <p>Through the Poincaré inequality, diffusion damps <span class="tex">e^\perp</span> to a bounded set, <span class="tex">\norm{e^\perp}\le e^\perp_{\max}</span>, which includes a floor <span class="tex">e^\perp_{\mathrm{reach}}</span> for targets with gradients that diffusion cannot match. Hence</p>
+                <div class="tex-block" data-eq="26">\norm{e}_{L^2}^2\le|\ROI|\,\ebar^2+(e^\perp_{\max})^2,</div>
+                <p>and the rest of the analysis concerns the scalar <span class="tex">\ebar</span>.</p>
+            </section>
+
+            <section class="lesson-block">
+                <p class="lesson-kicker">Step 2 · Ideal convergence of the gate</p>
+                <p>For a fixed gate, the heat equation has a unique stable equilibrium <span class="tex">T_g</span>, with mean error <span class="tex">\ess(g)=\langle\Ts-T_g\rangle</span> (28). More gate means more heating, so (Lemma 1)</p>
+                <div class="tex-block">g_2&gt;g_1\ \Rightarrow\ \ess(g_2)&lt;\ess(g_1),</div>
+                <p>with a zero at <span class="tex">g^\star\in(0,1)</span> and slope <span class="tex">-\ess'\ge m_e&gt;0</span> (Assumption 1). With the Lyapunov function</p>
+                <div class="tex-block" data-eq="30–31">V(g)=-\int_{g^\star}^{g}\ess(s)\,ds\ \ge0,\qquad \dot V=-k_I\,\ess(g)^2\le0,</div>
+                <p>the gate converges to <span class="tex">g^\star</span> and <span class="tex">\ebar\to0</span> for any <span class="tex">k_I&gt;0</span> (Theorem 1). Each disturbance regime has its own map and its own <span class="tex">g^\star_r</span>.</p>
+            </section>
+
+            <section class="lesson-block">
+                <p class="lesson-kicker">Step 3 · Ultimate boundedness (GUUB)</p>
+                <p>With the real single moving source and bounded disturbances, the mean error differs from the ideal map by a bounded residual:</p>
+                <div class="tex-block" data-eq="35–36">\ebar(t)=\ess\big(g(t)\big)+\Delta(t),\qquad |\Delta(t)|\le\bar\Delta,</div>
+                <p>where <span class="tex">\bar\Delta</span> grows with the coverage residual, the standoff variation, and the disturbances. The same <span class="tex">V</span> decreases whenever <span class="tex">|\ess(g)|&gt;\bar\Delta</span> (40), so after a finite time (Theorem 2)</p>
+                <div class="tex-block" data-eq="37–38">|\ess(g)|\le\bar\Delta,\qquad |g-g^\star|\le\bar\Delta/m_e,\qquad |\ebar|\le2\bar\Delta.</div>
+                <p>In the workspace, the sweep period <span class="tex">\tau_{\mathrm{erg}}</span> replaces the distributed heating by a source that sweeps <span class="tex">\ROI</span> with the same time-averaged heating (33); the time-scale separation <span class="tex">\tau_{\mathrm{erg}}\ll\tau_{\mathrm{th}}</span> keeps <span class="tex">\bar\Delta</span> small.</p>
+            </section>
+
+            <section class="lesson-block">
+                <p class="lesson-kicker">Discrete-time gain bound (Sec. V-D)</p>
+                <div class="tex-block" data-eq="41">g_{k+1}=\Pi_{[0,1]}\big(g_k+k_I\,\Delta t\,\ebar_k\big)</div>
+                <p>Linearized near <span class="tex">g^\star</span>, stability and non-oscillatory convergence require</p>
+                <div class="tex-block" data-eq="42">k_I&lt;\frac{2}{\Delta t\,|\ess'(g^\star)|},\qquad k_I&lt;\frac{1}{\Delta t\,|\ess'(g^\star)|}.</div>
+                <p>In continuous time any <span class="tex">k_I&gt;0</span> converges; the explicit-Euler loop does not. Since <span class="tex">\ess'</span> depends on the unknown thermal properties, <span class="tex">k_I</span> is chosen small.</p>
+            </section>
+
+            <section class="lesson-block">
+                <p class="lesson-kicker">Try this</p>
+                <ol class="missions">
+                    <li>Play the default run (discrete, <span class="tex">k_I=0.1</span>) and follow <span class="tex">g(t)</span> to each <span class="tex">g^\star_r</span>; <span class="tex">V(g(t))</span> steps up at every regime change and then decays.</li>
+                    <li>In <b>Step 1</b>, compare <span class="tex">|\ROI|^{1/2}|\ebar|</span>, which the gate drives to zero, with <span class="tex">\norm{e^\perp}</span>, which stays bounded; without disturbances, it stays at the floor set by the step of <span class="tex">\Ts</span>.</li>
+                    <li>In <b>Step 2</b>, watch the state slide down <span class="tex">V(g)</span>. Move the start gate <span class="tex">g(0)</span>: every start reaches the same <span class="tex">g^\star</span>.</li>
+                    <li>In <b>Step 3</b>, switch the disturbances off and set the sweep period to <span class="tex">\tau_{\mathrm{erg}}=0.2</span> s, then 0.5 s: <span class="tex">g</span> no longer converges to <span class="tex">g^\star</span> but settles in a band, within the bounds (37)–(38). As <span class="tex">\tau_{\mathrm{erg}}</span> approaches <span class="tex">\tau_{\mathrm{th}}\approx1.8</span> s, the residual grows and the gate saturates at 1: the time-scale separation no longer holds.</li>
+                    <li>Set <span class="tex">k_I=20</span>: the discrete loop sustains a limit cycle, the continuous loop converges. <b>Compare the four cases</b> reproduces the bottom row of Fig. 5.</li>
+                </ol>
+            </section>
+
+            <section class="lesson-block takeaway">
+                <p>Diffusion bounds the shape of the error, the monotone map <span class="tex">\ess(g)</span> and the integral law drive its mean to zero, and the coverage and disturbance residuals only enlarge the final set: the error is ultimately bounded, not divergent.</p>
+            </section>
+
+            <div class="lesson-nav">
+                <a class="button" href="control.html">◀ Control demo</a>
+                <a class="button primary" href="index.html">Overview ▶</a>
+            </div>
+        </aside>
+        <main class="workspace" id="workspace"></main>
+    </div>
+</body>
+</html>
