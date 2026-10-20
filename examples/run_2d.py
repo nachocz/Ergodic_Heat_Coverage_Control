@@ -16,7 +16,7 @@ matplotlib.use("Agg")
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from ehcc import DEFAULT_MATERIAL, TARGETS, Config, EHCCSimulation, load_material, load_target  # noqa: E402
 from ehcc.plotting import summary  # noqa: E402
-from benchmark import DISTURBANCES, K_I  # noqa: E402
+from ehcc.benchmark import K_I, disturbances  # noqa: E402
 
 
 def main() -> None:
@@ -30,15 +30,15 @@ def main() -> None:
     config = Config.from_yaml(args.config) if args.config else Config()
     config.standoff.k_I = K_I.get(args.target, config.standoff.k_I)
     material = load_material(DEFAULT_MATERIAL[args.target], config.N) if args.target in DEFAULT_MATERIAL else None
-    disturbances = [] if args.no_disturbances else DISTURBANCES
-    sim = EHCCSimulation(config, load_target(args.target, config.N), material, disturbances=disturbances)
+    dist = [] if args.no_disturbances else disturbances()
+    sim = EHCCSimulation(config, load_target(args.target, config.N), material, disturbances=dist)
     sim.run(args.steps, progress=1000)
 
     name = os.path.splitext(os.path.basename(args.target))[0]
     out = os.path.join("outputs", name)
     os.makedirs(out, exist_ok=True)
     sim.save(os.path.join(out, "run.npz"))
-    summary(sim, os.path.join(out, "summary.png"), disturbances)
+    summary(sim, os.path.join(out, "summary.png"), dist)
     print(f"written: {out}/summary.png, {out}/run.npz")
 
 

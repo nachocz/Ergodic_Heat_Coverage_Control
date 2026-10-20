@@ -22,10 +22,12 @@ class ErgodicController:
         self.dt = dt
         k = np.arange(cfg.K)
         self.k1, self.k2 = (a.ravel() for a in np.meshgrid(k, k, indexing="ij"))
-        self.Lambda = (1.0 + self.k1**2 + self.k2**2) ** (-cfg.s)
+        self.Lambda = 1.0 / (1.0 + self.k1**2 + self.k2**2) ** cfg.s
         xs = np.linspace(0.0, 1.0, N)
-        # cos(k pi x) on the grid; Psi_k is separable, so (12) costs two small matrix products.
-        self.C = np.cos(np.pi * np.outer(k, xs))            # (K, N)
+        X, Y = np.meshgrid(xs, xs)
+        # Psi_k on the grid nodes, one column per mode (k1 outer, k2 inner)
+        self.basis = np.stack([np.cos(a * np.pi * X) * np.cos(b * np.pi * Y)
+                               for a, b in zip(self.k1, self.k2)], axis=-1).reshape(N * N, -1)
         self.phi = np.zeros(cfg.K**2)
         self.reset()
 
@@ -39,7 +41,7 @@ class ErgodicController:
 
         phi[k1, k2] = sum_iy sum_ix cos(k1 pi x_ix) cos(k2 pi y_iy) Phi[iy, ix].
         """
-        self.phi = (self.C @ Phi @ self.C.T).T.ravel()
+        self.phi = Phi.reshape(-1) @ self.basis
 
     def psi(self, p) -> np.ndarray:
         return np.cos(np.pi * self.k1 * p[0]) * np.cos(np.pi * self.k2 * p[1])

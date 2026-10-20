@@ -10,7 +10,6 @@ import numpy as np
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
-sys.path.insert(0, os.path.join(ROOT, "examples"))
 from ehcc import (Config, Domain, EHCCSimulation, ErgodicController, HeatEquation, Loop1D, Surface,  # noqa: E402
                   efficiency, heat_kernel, kernel_width, load_target, roi_mask)
 
@@ -75,12 +74,20 @@ class Model(unittest.TestCase):
 class ClosedLoop(unittest.TestCase):
     def test_table_II_row_T4(self):
         """EHCC on T4 (Table II): <e_bar> = -0.11 C, <sigma_e> = 2.82 C, int ||e|| dt = 1.11e5."""
-        from benchmark import metrics, run
-        _, logs = run("T4")
-        m = metrics(logs)
+        from ehcc.benchmark import metrics, run
+        m = metrics(run("T4").logs())
         self.assertAlmostEqual(m["e_mean"], -0.11, delta=0.005)
         self.assertAlmostEqual(m["e_std"], 2.82, delta=0.005)
         self.assertAlmostEqual(m["l2_integral"] / 1e5, 1.11, delta=0.005)
+
+    def test_table_II_rows_T4_baselines(self):
+        """Greedy-A, GTM, and LQG-M on T4 (Table II); MPDC and the other targets: examples/benchmark.py."""
+        from ehcc.benchmark import metrics, run
+        for method, expected in (("greedy", (1.21, 0.36, 2.94)), ("gtm", (1.09, -1.37, 2.40)), ("lqg_m", (1.34, -1.54, 2.73))):
+            m = metrics(run("T4", method).logs())
+            got = (m["l2_integral"] / 1e5, m["e_mean"], m["e_std"])
+            for value, ref in zip(got, expected):
+                self.assertAlmostEqual(value, ref, delta=0.005, msg=method)
 
     def test_gate_stays_in_unit_interval_and_d_in_its_range(self):
         cfg = Config()

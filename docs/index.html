@@ -106,12 +106,12 @@
             <div class="section-heading"><h2 id="codeHeading">Code</h2><p>Python reference implementation, and these pages</p></div>
             <div class="two-col">
                 <div class="prose">
-                    <p>The package <code>ehcc/</code> implements the thermal plant (2)–(4), the ergodic controller (9)–(16), the standoff controller (17)–(24), the surface frame (5), and the 1D loop of Sec. V, with the parameters of the simulation benchmark. Its tests reproduce the EHCC row of Table II for target T4 and the equilibria of Fig. 5.</p>
+                    <p>The package <code>ehcc/</code> implements the thermal plant (2)–(4), the ergodic controller (9)–(16), the standoff controller (17)–(24), the surface frame (5), the five controllers of the simulation benchmark, and the 1D loop of Sec. V, with the parameters of the benchmark. The scripts in <code>figures/</code> and <code>examples/benchmark.py</code> generate the simulation figures (Figs. 4–9) and Tables II–III.</p>
 <pre class="code-block">pip install -r requirements.txt
 python examples/run_2d.py          # T4 "dignity", hot and cold disturbances
 python examples/run_3d.py          # scanned sole surface (Sec. VII)
-python examples/stability_1d.py    # Fig. 5
-python examples/benchmark.py       # metrics of Tables II and III
+python examples/benchmark.py       # Tables II and III (six methods)
+python figures/fig5_ki_comparison.py   # Fig. 5; figures/ has Figs. 4-9
 python -m unittest discover tests</pre>
                 </div>
                 <div class="prose">

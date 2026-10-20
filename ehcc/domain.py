@@ -115,6 +115,7 @@ class Domain:
         else:
             self.lam = np.asarray(material[..., 0], dtype=float)
             self.kappa = np.asarray(material[..., 1], dtype=float)
+        self.outside_roi_coupling = float(outside_roi_coupling)
         self.coupling = np.where(self.roi, 1.0, outside_roi_coupling)
         self.alpha = self.lam * self.kappa * self.coupling      # diffusivity alpha(x)
         self.e_max = max(1.0, float(np.max(self.T_star - self.T_amb)))   # (18): max e_+(x, 0)

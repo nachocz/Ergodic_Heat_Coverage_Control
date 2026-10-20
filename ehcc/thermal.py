@@ -5,7 +5,9 @@
 
 on the normalized domain with Neumann (zero-flux) boundaries, integrated with
 explicit Euler steps in the order heating, losses, diffusion. The controller
-never uses this model: it only produces the "measured" field T.
+never uses this model: it only produces the "measured" field T. The operations
+follow the order of the benchmark code of Sec. VI, so that its runs, including
+the chaotic ones of the baselines, are reproduced to rounding.
 """
 from __future__ import annotations
 
@@ -15,7 +17,7 @@ from typing import Iterable
 import numpy as np
 
 from .config import HeaterConfig
-from .domain import Domain
+from .domain import Domain, grid
 
 
 def ratio(d: float, d_min: float, d_max: float) -> float:
@@ -34,18 +36,23 @@ def kernel_width(d: float, heater: HeaterConfig, d_min: float, d_max: float) -> 
     return heater.sigma_min + (heater.sigma_max - heater.sigma_min) * ratio(d, d_min, d_max)
 
 
-def gaussian(N: int, center, sigma: float) -> np.ndarray:
-    """exp(-|x - center|^2 / (2 sigma^2)) on the grid, as an outer product of two 1D profiles."""
-    xs = np.linspace(0.0, 1.0, N)
-    gx = np.exp(-((xs - center[0]) ** 2) / (2.0 * sigma**2))
-    gy = np.exp(-((xs - center[1]) ** 2) / (2.0 * sigma**2))
-    return np.outer(gy, gx)
+def gaussian(X: np.ndarray, Y: np.ndarray, center, sigma: float) -> np.ndarray:
+    """exp(-|x - center|^2 / (2 sigma^2)) on the grid nodes X, Y."""
+    dist_sq = (X - center[0]) ** 2 + (Y - center[1]) ** 2
+    return np.exp(-dist_sq / (2.0 * sigma**2))
+
+
+def power_density(X: np.ndarray, Y: np.ndarray, center, sigma: float, power: float) -> np.ndarray:
+    """power * K(x; center, sigma), with K normalized so that sum(K) dx^2 = 1."""
+    g = gaussian(X, Y, center, sigma)
+    dx = 1.0 / (X.shape[0] - 1)
+    return power * g / (np.sum(g) * dx**2)
 
 
 def heat_kernel(N: int, p, sigma: float) -> np.ndarray:
-    """K(x; p, d): Gaussian centred at p, normalized so that sum(K) dx^2 = 1."""
-    g = gaussian(N, p, sigma)
-    return g / (g.sum() / (N - 1) ** 2)
+    """K(x; p, d) on the N x N grid, sum(K) dx^2 = 1."""
+    X, Y = grid(N)
+    return power_density(X, Y, p, sigma, 1.0)
 
 
 @dataclass
@@ -70,36 +77,40 @@ class HeatEquation:
         self.heater = heater
         self.h = h
 
-    def absorption(self, T_source: float) -> np.ndarray:
-        """Fraction of the incident flux absorbed: 1 at T_amb, 0 at T_source."""
-        T, T_amb = self.domain.T, self.domain.T_amb
-        return np.maximum(T_source - T, 0.0) / max(T_source - T_amb, 1e-9)
+    def _couple(self, q: np.ndarray) -> np.ndarray:
+        """Flux reduced outside Omega_ROI (insulating backing)."""
+        D = self.domain
+        return np.where(D.roi, q, q * D.outside_roi_coupling)
 
     def heat(self, q_in: np.ndarray, dt: float) -> None:
-        """lambda q_in, with q_in in [W per unit normalized area]."""
+        """lambda q_in, with the absorbed fraction (T_source - T) / (T_source - T_amb)."""
         D = self.domain
-        D.T += D.lam * D.coupling * q_in * self.absorption(self.heater.T_source) * dt
+        T_source = self.heater.T_source
+        span = T_source - D.T_amb
+        absorbed = np.maximum(T_source - D.T, 0.0) / span if span > 0 else 0.0
+        D.T += D.lam * self._couple(q_in * absorbed) * dt
 
     def lose(self, dt: float) -> None:
         """-lambda q_loss(T), Newton cooling to the ambient."""
         D = self.domain
-        D.T -= D.lam * D.coupling * self.h * (D.T - D.T_amb) * dt
+        D.T -= D.lam * self._couple(self.h * (D.T - D.T_amb)) * dt
         np.maximum(D.T, D.T_amb, out=D.T)
 
     def diffuse(self, dt: float) -> None:
         """div(alpha grad T): conservative 5-point scheme, face diffusivities by averaging."""
         D = self.domain
         T, a = D.T, D.alpha
+        dx2 = D.dx**2
         ax = 0.5 * (a[:, :-1] + a[:, 1:])           # faces between columns
         ay = 0.5 * (a[:-1, :] + a[1:, :])           # faces between rows
-        fx = ax * (T[:, 1:] - T[:, :-1])            # flux across each face (zero at the boundary)
-        fy = ay * (T[1:, :] - T[:-1, :])
         div = np.zeros_like(T)
-        div[:, :-1] += fx
-        div[:, 1:] -= fx
-        div[:-1, :] += fy
-        div[1:, :] -= fy
-        T += div * dt / D.dx**2
+        div[:, 1:-1] += (ax[:, 1:] * (T[:, 2:] - T[:, 1:-1]) - ax[:, :-1] * (T[:, 1:-1] - T[:, :-2])) / dx2
+        div[:, 0] += ax[:, 0] * (T[:, 1] - T[:, 0]) / dx2          # zero flux through the boundary
+        div[:, -1] += -ax[:, -1] * (T[:, -1] - T[:, -2]) / dx2
+        div[1:-1, :] += (ay[1:, :] * (T[2:, :] - T[1:-1, :]) - ay[:-1, :] * (T[1:-1, :] - T[:-2, :])) / dx2
+        div[0, :] += ay[0, :] * (T[1, :] - T[0, :]) / dx2
+        div[-1, :] += -ay[-1, :] * (T[-1, :] - T[-2, :]) / dx2
+        T += div * dt
 
     def disturb(self, disturbances: Iterable[Disturbance], t: float, dt: float) -> None:
         """Hot sources heat like the heater; cold sinks extract heat in proportion to T - T_amb."""
@@ -107,12 +118,13 @@ class HeatEquation:
         for dist in disturbances:
             if not dist.active(t):
                 continue
-            density = dist.P * heat_kernel(D.N, dist.center, dist.sigma)
+            density = power_density(D.X, D.Y, dist.center, dist.sigma, dist.P)
             if dist.P >= 0.0:
-                absorbed = self.absorption(dist.T_source)
+                span = dist.T_source - D.T_amb
+                absorbed = np.maximum(dist.T_source - D.T, 0.0) / span if span > 0 else np.zeros_like(D.T)
             else:
-                absorbed = np.maximum(D.T - D.T_amb, 0.0) / max(float(D.T.max()) - D.T_amb, 1.0)
-            D.T += D.lam * D.coupling * density * absorbed * dt
+                absorbed = np.maximum(D.T - D.T_amb, 0.0) / max(float(np.max(D.T)) - D.T_amb, 1.0)
+            D.T += D.lam * self._couple(density * absorbed) * dt
 
     def step(self, q_in: np.ndarray, dt: float, t: float = 0.0, disturbances: Iterable[Disturbance] = ()) -> None:
         self.heat(q_in, dt)

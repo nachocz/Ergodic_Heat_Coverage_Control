@@ -4,7 +4,8 @@ Code and interactive pages for the paper *Ergodic Heat Coverage Control: Model-F
 
 A robot-mounted heat source drives the temperature field `T(x, t)` of a material surface to a target distribution `T*(x)` on a region of interest `Ω_ROI`, without a thermal model of the material. EHCC closes the loop on the measured error `e = T* − T` with two decoupled controllers: an ergodic coverage controller moves the focal point `p(t)` so that the time-averaged heat footprint matches the heat deficit `e₊`, and a standoff controller sets the source-to-surface distance `d(t)`, and with it the injected power, through an integral law on the mean error. The stability analysis establishes global uniform ultimate boundedness (GUUB) of the error.
 
-- **`ehcc/`**: Python reference implementation (numpy, scipy): the thermal plant, the two controllers, the surface frame, and the 1D loop of the stability analysis, in the notation of the paper.
+- **`ehcc/`**: Python reference implementation (numpy, scipy): the thermal plant, the two controllers, the surface frame, the five controllers of the simulation benchmark, and the 1D loop of the stability analysis, in the notation of the paper.
+- **`figures/`, `examples/benchmark.py`**: scripts that generate the simulation figures (Figs. 4–9) and the tables of the simulation benchmark (Tables II–III).
 - **`docs/`**: interactive pages (static HTML and JavaScript), also suitable for GitHub Pages: an overview with Fig. 1 and the video, the problem setup and notation, a closed-loop control demo in 2D and on 3D surfaces, and an animated version of the stability analysis (Fig. 5).
 
 Video of the experiments (7 min, 20× speed): [`docs/video/ehcc_experiments.mp4`](docs/video/ehcc_experiments.mp4), also on the overview page.
@@ -33,8 +34,7 @@ pip install -r requirements.txt
 python examples/run_2d.py            # T4 "dignity", hot and cold disturbances -> outputs/T4/summary.png
 python examples/run_3d.py            # scanned sole surface and target of the 3D trial (Sec. VII)
 python examples/run_3d.py --live     # with a live Open3D window (pip install open3d)
-python examples/stability_1d.py      # Fig. 5 -> outputs/ki_comparison.png
-python examples/benchmark.py         # metrics of Tables II and III for EHCC
+python examples/benchmark.py         # Tables II and III: six methods, T1-T5 and the interleaved case
 python -m unittest discover tests -v
 ```
 
@@ -46,7 +46,24 @@ logs = sim.run(3000)                                  # 10 min of simulated time
 print(logs["e_mean"][-1], logs["d_lb"][-1])
 ```
 
-The tests check the model (kernel normalization, monotone actuation, heat conservation of the diffusion step, spectral coefficients, orthonormal surface frame), reproduce the EHCC row of Table II for target T4 (⟨ē⟩ = −0.11 °C, ⟨σ_e⟩ = 2.82 °C, ∫‖e‖ dt = 1.11 × 10⁵), the monotone map of Lemma 1 and the regime equilibria of Fig. 5 (g* = 0.31, 0.03, 0.66), and the behaviour of the discrete gate for k_I = 0.1 and 20. `tests/test_web_parity.py` runs the JavaScript port of the pages with Node.js (skipped without it) and checks that it gives the same logs as the package.
+## Reproducing the simulation results of the paper
+
+Run the scripts from the repository root; the figures are written to `outputs/figures/` (PDF and PNG).
+
+| Result | Script | Time |
+|---|---|---|
+| Fig. 4, principle of EHCC (Sec. III) | `python figures/fig4_principle.py` | 1 min |
+| Fig. 5, 1D loop with discrete and continuous gate laws (Sec. V) | `python figures/fig5_ki_comparison.py` | 10 s |
+| Fig. 6, ergodic metric under parameter ablations (Sec. V-C) | `python figures/fig6_ablation.py` | 1 min |
+| Tables II and III, simulation benchmark (Sec. VI) | `python examples/benchmark.py` | 10 min |
+| Figs. 7 and 8, error, cost, and trajectories of the benchmark | `python figures/fig7_fig8_benchmark.py` | uses the runs of the benchmark |
+| Fig. 9, interleaved heterogeneity (Sec. VI-E) | `python figures/fig9_interleaved.py` (`--full` adds error and cost) | uses the runs of the benchmark |
+
+The benchmark runs are saved in `outputs/benchmark/<target>/<method>.npz` and computed by the figure scripts if missing. The computation times of the controllers (cost columns and the cost panels of Figs. 7 and 9) depend on the machine.
+
+## Tests
+
+The tests check the model (kernel normalization, monotone actuation, heat conservation of the diffusion step, spectral coefficients, orthonormal surface frame), reproduce the rows of Table II for target T4 of EHCC (⟨ē⟩ = −0.11 °C, ⟨σ_e⟩ = 2.82 °C, ∫‖e‖ dt = 1.11 × 10⁵), Greedy-A, GTM, and LQG-M, the monotone map of Lemma 1 and the regime equilibria of Fig. 5 (g* = 0.31, 0.03, 0.66), and the behaviour of the discrete gate for k_I = 0.1 and 20. `tests/test_web_parity.py` runs the JavaScript port of the pages with Node.js (skipped without it) and checks that it gives the same logs as the package.
 
 ### Paper and code
 
@@ -60,6 +77,7 @@ The tests check the model (kernel normalization, monotone actuation, heat conser
 | basis (11), coefficients (12)–(13), ergodic metric (14)–(15), tangential law (16) | `ergodic.ErgodicController` |
 | local deficit (17), standoff map (18), `d_lb` (20)–(21), gate (22) | `standoff.StandoffController` |
 | closed loop (Fig. 2) and disturbances (Sec. VI-A) | `simulation.EHCCSimulation`, `thermal.Disturbance` |
+| benchmark controllers EHCC-NA, Greedy-A, GTM (43), LQG-M, MPDC (44) (Sec. VI, Tables I and IX) | `benchmark.BenchmarkSimulation`, `baselines` |
 | idealized loop (27), `ē_ss(g)` (28), `g*`, `V(g)` (30), discrete gate (41)–(42) | `stability.Loop1D` |
 
 ## Notes on the simulation
@@ -73,9 +91,10 @@ The tests check the model (kernel normalization, monotone actuation, heat conser
 ## Repository layout
 
 ```
-ehcc/                 Python package (config, domain, thermal, ergodic, standoff, surface, simulation, stability, plotting, viewer3d)
-examples/             run_2d.py, run_3d.py, stability_1d.py, benchmark.py, export_web_data.py
-tests/                unit tests, Table II row, Fig. 5 equilibria, parity of the web port
+ehcc/                 Python package (config, domain, thermal, ergodic, standoff, surface, simulation, benchmark, baselines, stability, plotting, viewer3d)
+examples/             run_2d.py, run_3d.py, benchmark.py, export_web_data.py
+figures/              fig4_principle.py, fig5_ki_comparison.py, fig6_ablation.py, fig7_fig8_benchmark.py, fig9_interleaved.py
+tests/                unit tests, rows of Table II, Fig. 5 equilibria, parity of the web port
 assets/               targets T1-T5, interleaved case, 3D trial; material layouts; scanned surface
 docs/                 interactive pages: html, css, js/sim (port of ehcc), js/lib, js/pages, data, img, audio, vendor
 config.yaml           default parameters

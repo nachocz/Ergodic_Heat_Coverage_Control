@@ -18,7 +18,7 @@ from .domain import Domain
 from .ergodic import ErgodicController
 from .standoff import StandoffController
 from .surface import Surface
-from .thermal import Disturbance, HeatEquation, efficiency, heat_kernel, kernel_width
+from .thermal import Disturbance, HeatEquation, efficiency, kernel_width, power_density
 
 LOG_KEYS = ("t", "px", "py", "d", "d_lb", "gate", "eta", "Q_in", "e_p", "E",
             "e_mean", "e_std", "e_rms", "e_plus_mean", "l2_error", "rx", "ry", "rz")
@@ -50,7 +50,8 @@ class EHCCSimulation:
         cfg = self.cfg
         lo, hi = cfg.standoff.d_min, cfg.standoff.d_max
         eta = efficiency(d, cfg.heater, lo, hi)
-        return cfg.heater.P * eta * heat_kernel(cfg.N, self.p, kernel_width(d, cfg.heater, lo, hi))
+        D = self.domain
+        return power_density(D.X, D.Y, self.p, kernel_width(d, cfg.heater, lo, hi), cfg.heater.P * eta)
 
     def step(self) -> Dict[str, float]:
         cfg, D = self.cfg, self.domain
@@ -60,6 +61,11 @@ class EHCCSimulation:
         self.heat.step(self.q_in(d), cfg.dt, self.t, self.disturbances)
         self.ergodic.set_target(D.heating_density())
         u, E = self.ergodic.step(self.p)
+        return self._move_and_record(u, d, E)
+
+    def _move_and_record(self, u: np.ndarray, d: float, E: float) -> Dict[str, float]:
+        """p <- p + u dt (kept inside the domain), then one row of the logs at the previous p."""
+        cfg, D = self.cfg, self.domain
         p_now = self.p.copy()
         self.p = np.clip(self.p + u * cfg.dt, 0.01, 0.99)
         self.trajectory.append(self.p.copy())

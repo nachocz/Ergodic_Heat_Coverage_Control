@@ -2,7 +2,7 @@
 explicit-Euler version (41), each at k_I = 0.1 and k_I = 20, over five 20 s regimes
 (start-up, hot disturbance, recovery, cold disturbance, recovery).
 
-    python examples/stability_1d.py            writes outputs/ki_comparison.png and .pdf (about 10 s)
+    python figures/fig5_ki_comparison.py      writes outputs/figures/fig5_ki_comparison.pdf and .png (about 10 s)
 """
 import os
 import sys
@@ -79,10 +79,11 @@ def main() -> None:
     axes[3].set_ylim(1e-5, 1.0)
     axes[2].legend(loc="upper right", ncol=2, fontsize=7)
 
-    os.makedirs("outputs", exist_ok=True)
+    out = os.path.join("outputs", "figures")
+    os.makedirs(out, exist_ok=True)
     for ext in ("png", "pdf"):
-        fig.savefig(os.path.join("outputs", f"ki_comparison.{ext}"), dpi=200, bbox_inches="tight")
-    print("written: outputs/ki_comparison.png, outputs/ki_comparison.pdf")
+        fig.savefig(os.path.join(out, f"fig5_ki_comparison.{ext}"), dpi=200, bbox_inches="tight")
+    print(f"written: {out}/fig5_ki_comparison.pdf and .png")
 
 
 if __name__ == "__main__":
