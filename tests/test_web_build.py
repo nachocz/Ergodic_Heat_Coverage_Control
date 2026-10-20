@@ -1,9 +1,8 @@
-"""The files built by tools/build_web.py match their sources, and the pages load only
-files that need no CORS request (so that they work on anonymous.4open.science and from
-the disk). Runs without Node.js: the bundles carry the digest of the module sources.
+"""The pages in docs/ are self-contained and match their sources (tools/build_web.py), so
+that they work on anonymous.4open.science (sandboxed, no CORS, 175 requests per 15 min)
+and from the disk. Runs without Node.js: each bundle carries the digest of the module sources.
 """
 import importlib.util
-import os
 import re
 import unittest
 from pathlib import Path
@@ -15,29 +14,35 @@ build_web = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(build_web)
 
 
+def page(name):
+    return (DOCS / name).read_text(encoding="utf-8").replace("\r\n", "\n")
+
+
 class WebBuild(unittest.TestCase):
     def test_bundles_match_sources(self):
         digest = build_web.sources_digest()
-        for page in build_web.PAGES:
-            text = (DOCS / "js" / "dist" / f"{page}.js").read_text(encoding="utf-8")
-            self.assertTrue(text.startswith(build_web.bundle_header(page, digest)),
-                            f"docs/js/dist/{page}.js is out of date: run python tools/build_web.py")
+        for name in build_web.PAGES:
+            blocks = {m[2]: m[3] for m in build_web.BLOCK.finditer(page(name))}
+            entries = [path for path in blocks if path.startswith("js/pages/")]
+            self.assertEqual(len(entries), 1, name)
+            self.assertTrue(blocks[entries[0]].strip("\n").startswith(build_web.bundle_header(entries[0], digest).strip("\n")),
+                            f"docs/{name}: the page script is out of date, run python tools/build_web.py")
 
-    def test_fields_script_matches_json(self):
-        text = (DOCS / "data" / "fields.js").read_text(encoding="utf-8")
-        self.assertEqual(text, build_web.fields_js(), "docs/data/fields.js is out of date: run python tools/build_web.py")
+    def test_inline_blocks_match_sources(self):
+        for name in build_web.PAGES:
+            html = page(name)
+            blocks = {m[2]: m[3] for m in build_web.BLOCK.finditer(html)}
+            self.assertEqual(build_web.render(html, lambda entry: blocks[entry]), html,
+                             f"docs/{name} is out of date: run python tools/build_web.py")
 
-    def test_katex_fonts_embedded(self):
-        css = (DOCS / "vendor" / "katex" / "katex.inline.min.css").read_text(encoding="utf-8")
-        self.assertEqual(css, build_web.katex_css())
-
-    def test_pages_load_classic_scripts_only(self):
-        for name in ("index.html", "problem.html", "control.html", "stability.html", "player.html"):
-            html = (DOCS / name).read_text(encoding="utf-8")
+    def test_pages_load_no_files(self):
+        for name in build_web.PAGES:
+            html = page(name)
             self.assertNotIn('type="module"', html, name)
-            self.assertNotIn("katex.min.css", html, name)
-            for src in re.findall(r'<script[^>]*\ssrc="([^"]+)"', html):
-                self.assertTrue((DOCS / src).is_file(), f"{name}: missing {src}")
+            self.assertIsNone(re.search(r'<script[^>]*\ssrc=', html), name)
+            self.assertIsNone(re.search(r'<link[^>]*rel="stylesheet"', html), name)
+            for m in build_web.ATTRIBUTE.finditer(html):
+                self.assertTrue(html[m.start():m.end()].split('"')[1].startswith("data:"), f"{name}: {m[3]}")
 
 
 if __name__ == "__main__":

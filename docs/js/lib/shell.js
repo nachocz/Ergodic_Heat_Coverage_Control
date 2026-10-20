@@ -33,22 +33,13 @@ export async function initPage() {
 }
 
 let fields = null;
-// Targets, material layouts, and the scanned surface: docs/data/fields.json, loaded
-// as the script docs/data/fields.js (a fetch would fail on sandboxed hosts and on
-// file:// addresses).
+// Targets, material layouts, and the scanned surface (docs/data/fields.json). The built
+// pages contain them as window.EHCC_FIELDS (tools/build_web.py); a fetch, which fails
+// on sandboxed hosts and on file:// addresses, is only the fallback.
 export async function loadFields() {
     if (!fields) {
         const { decodeFields } = await import('../sim/ehcc.js');
-        if (!window.EHCC_FIELDS) {
-            await new Promise((resolve, reject) => {
-                const script = document.createElement('script');
-                script.src = 'data/fields.js';
-                script.onload = resolve;
-                script.onerror = () => reject(new Error('data/fields.js could not be loaded'));
-                document.head.append(script);
-            });
-        }
-        fields = decodeFields(window.EHCC_FIELDS);
+        fields = decodeFields(window.EHCC_FIELDS || await (await fetch('data/fields.json')).json());
     }
     return fields;
 }

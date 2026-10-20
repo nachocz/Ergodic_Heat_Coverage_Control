@@ -188,6 +188,7 @@ code, .mono { font-family: var(--mono); font-size: 0.86em; }
 .lesson-block { margin-top: 20px; }
 .lesson-block p, .lesson-block li { color: var(--ink-soft); font-size: 0.86rem; }
 .lesson-kicker { margin-bottom: 8px !important; color: var(--accent-strong) !important; font-size: 0.66rem !important; font-weight: 820; letter-spacing: 0.09em; text-transform: uppercase; }
+.tex:not([data-rendered]), .tex-block:not([data-rendered]) { visibility: hidden; }   /* TeX source until KaTeX (end of the page) runs */
 .tex-block { margin: 10px 0 12px; padding: 10px 12px; overflow-x: auto; border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; background: var(--surface-soft); }
 .tex-block .katex-display { margin: 0; }
 .tex-block .katex-display > .katex { font-size: 1.06em; }

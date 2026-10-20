@@ -25,12 +25,12 @@ To open them locally (Python standard library only):
 python run.py            # serves docs/ at http://127.0.0.1:8765 and opens the browser
 ```
 
-`docs/index.html` also opens directly from the disk. For GitHub Pages, select *Deploy from a branch*, branch `main`, folder `/docs`. The pages load only classic scripts, a style sheet with embedded fonts, and their data as a script (no ES modules, font files, or `fetch` requests). They therefore also work on hosts that serve every page in a sandboxed origin without CORS headers, such as the anonymized pages of anonymous.4open.science. KaTeX (equations) and three.js r160 (3D views) are included in `docs/vendor/`. The ♪ button plays optional background music (calm piano pieces; public domain and CC BY 4.0, see `docs/audio/CREDITS.md`), and ◐ switches between the light and dark themes.
+`docs/index.html` also opens directly from the disk. For GitHub Pages, select *Deploy from a branch*, branch `main`, folder `/docs`. Each page is a single HTML file that contains its style sheets, the KaTeX fonts, its script, its data, and its figures, so that a page view is one request (the video and the music load their files only when played). The pages therefore also work on hosts that serve every page in a sandboxed origin without CORS headers and limit the number of requests, such as the anonymized pages of anonymous.4open.science (175 requests per 15 minutes). KaTeX (equations) and three.js r160 (3D views) are included in `docs/vendor/`. The ♪ button plays optional background music (calm piano pieces; public domain and CC BY 4.0, see `docs/audio/CREDITS.md`), and ◐ switches between the light and dark themes.
 
-The sources of the pages are ES modules in `docs/js/lib`, `docs/js/pages`, and `docs/js/sim` (the JavaScript port of `ehcc/`). After editing them or `docs/data/fields.json`, rebuild the files that the pages load (Node.js is needed; `npx` fetches esbuild):
+The sources of the pages are the HTML outside the blocks marked `data-inline`, `docs/css/app.css`, and the ES modules in `docs/js/lib`, `docs/js/pages`, and `docs/js/sim` (the JavaScript port of `ehcc/`). After editing them, `docs/data/fields.json`, or `docs/img`, fill the `data-inline` blocks again (Node.js is needed; `npx` fetches esbuild):
 
 ```bash
-python tools/build_web.py     # docs/js/dist/*.js, docs/vendor/katex/katex.inline.min.css, docs/data/fields.js
+python tools/build_web.py     # writes the style sheets, scripts, data, and figures into docs/*.html
 python run.py --sandbox       # check the pages as anonymous.4open.science serves them
 ```
 
@@ -69,7 +69,7 @@ The benchmark runs are saved in `outputs/benchmark/<target>/<method>.npz` and co
 
 ## Tests
 
-The tests check the model (kernel normalization, monotone actuation, heat conservation of the diffusion step, spectral coefficients, orthonormal surface frame), reproduce the rows of Table II for target T4 of EHCC (⟨ē⟩ = −0.11 °C, ⟨σ_e⟩ = 2.82 °C, ∫‖e‖ dt = 1.11 × 10⁵), Greedy-A, GTM, and LQG-M, the monotone map of Lemma 1 and the regime equilibria of Fig. 4 (g* = 0.31, 0.03, 0.66), and the behaviour of the discrete gate for k_I = 0.1 and 20. `tests/test_web_parity.py` runs the JavaScript port of the pages with Node.js (skipped without it) and checks that it gives the same logs as the package, and `tests/test_web_build.py` checks that the files built by `tools/build_web.py` match their sources.
+The tests check the model (kernel normalization, monotone actuation, heat conservation of the diffusion step, spectral coefficients, orthonormal surface frame), reproduce the rows of Table II for target T4 of EHCC (⟨ē⟩ = −0.11 °C, ⟨σ_e⟩ = 2.82 °C, ∫‖e‖ dt = 1.11 × 10⁵), Greedy-A, GTM, and LQG-M, the monotone map of Lemma 1 and the regime equilibria of Fig. 4 (g* = 0.31, 0.03, 0.66), and the behaviour of the discrete gate for k_I = 0.1 and 20. `tests/test_web_parity.py` runs the JavaScript port of the pages with Node.js (skipped without it) and checks that it gives the same logs as the package, and `tests/test_web_build.py` checks that the pages are self-contained and match their sources.
 
 ### Paper and code
 
@@ -102,8 +102,8 @@ examples/             run_2d.py, run_3d.py, benchmark.py, export_web_data.py
 figures/              fig4_ki_comparison.py, fig5_ablation.py, fig6_fig7_benchmark.py, fig8_interleaved.py
 tests/                unit tests, rows of Table II, Fig. 4 equilibria, parity of the web port
 assets/               targets T1-T5, interleaved case, 3D trial; material layouts; scanned surface
-docs/                 interactive pages: html, css, js/sim (port of ehcc), js/lib, js/pages, js/dist (built), data, img, audio, vendor
-tools/                build_web.py (builds the files that the pages load)
+docs/                 interactive pages (one self-contained html file each) and their sources: css, js/sim (port of ehcc), js/lib, js/pages, data, img, audio, vendor
+tools/                build_web.py (writes the style sheets, scripts, data, and figures into the pages)
 config.yaml           default parameters
 run.py                local server for docs/
 ```

@@ -2,7 +2,7 @@
 the web pages, resampled to the simulation grid (100 x 100) as base64 float32 arrays.
 
     python examples/export_web_data.py
-    python tools/build_web.py           # docs/data/fields.js, the copy that the pages load
+    python tools/build_web.py           # writes the data into the pages (docs/*.html)
 """
 import base64
 import json
