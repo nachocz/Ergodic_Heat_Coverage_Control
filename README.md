@@ -1,14 +1,15 @@
 # Ergodic Heat Coverage Control (EHCC)
 
-Code and interactive pages for the paper *Ergodic Heat Coverage Control: Model-Free Robotic Regulation of Temperature Distributions*.
+Code, interactive pages, and video for the paper *Ergodic Heat Coverage Control: Model-Free Robotic Regulation of Temperature Distributions*.
 
-A robot-mounted heat source drives the temperature field `T(x, t)` of a material surface to a target distribution `T*(x)` on a region of interest `Ω_ROI`, without a thermal model of the material. EHCC closes the loop on the measured error `e = T* − T` with two decoupled controllers: an ergodic coverage controller moves the focal point `p(t)` so that the time-averaged heat footprint matches the heat deficit `e₊`, and a standoff controller sets the source-to-surface distance `d(t)`, and with it the injected power, through an integral law on the mean error. The stability analysis establishes global uniform ultimate boundedness (GUUB) of the error.
+A robot-mounted heat source drives the temperature field `T(x, t)` of a material surface to a target distribution `T*(x)` on a region of interest `Ω_ROI`, without a thermal model of the material. EHCC closes the loop on the measured error `e = T* − T` with two decoupled controllers: an ergodic coverage controller moves the focal point `p(t)` so that the time-averaged heat footprint matches the heat deficit `e₊`, and a standoff controller sets the source-to-surface distance `d(t)`, and with it the injected power, through an integral law on the mean error. The stability analysis establishes global uniform ultimate boundedness (GUUB) of the closed loop.
 
-- **`ehcc/`**: Python reference implementation (numpy, scipy): the thermal plant, the two controllers, the surface frame, the five controllers of the simulation benchmark, and the 1D loop of the stability analysis, in the notation of the paper.
-- **`figures/`, `examples/benchmark.py`**: scripts that generate the simulation figures (Figs. 4–8) and the tables of the simulation benchmark (Tables II–III).
-- **`docs/`**: interactive pages (static HTML and JavaScript), also suitable for GitHub Pages: an overview with Fig. 1 and the video, the problem setup and notation, a closed-loop control demo in 2D and on 3D surfaces, and an animated version of the stability analysis (Fig. 4).
+This repository contains:
 
-Video of the experiments (7 min, 20× speed): [`docs/video/ehcc_experiments.mp4`](docs/video/ehcc_experiments.mp4), also on the overview page.
+- **Interactive pages** (`docs/`): the problem setup, the two controllers in closed loop on 2D and 3D surfaces, and the stability analysis, with the equations of the paper next to each simulation.
+- **Video of the experiments** (7 min, 20× speed): [`docs/video/ehcc_experiments.mp4`](docs/video/ehcc_experiments.mp4), also on the overview page.
+- **Python implementation** (`ehcc/`, numpy and scipy): the simulated thermal plant, the two controllers, the surface frame, the five comparison controllers of the simulation benchmark, and the 1D loop of the stability analysis, in the notation of the paper.
+- **Scripts that reproduce the simulation results**: Figs. 4–8 and Tables II–III.
 
 ## Interactive pages
 
@@ -19,30 +20,34 @@ Video of the experiments (7 min, 20× speed): [`docs/video/ehcc_experiments.mp4`
 | `control.html` | Secs. III–IV: ergodic law (10)–(16) and standoff law (17)–(24) in closed loop; targets T1–T5 (T4, the "dignity" shape of Fig. 2, by default), the interleaved case, and the 3D sole trial; flat, bump, wave, or scanned surface; uniform or heterogeneous material; gains; hot and cold disturbances; 2D and 3D views |
 | `stability.html` | Sec. V: the 1D loop of Fig. 4 (discrete and continuous gate laws), with the three steps of the analysis: reduction to the mean error, the monotone map `ē_ss(g)` and the Lyapunov function `V(g)`, the ultimate bound with a moving-source residual, and the discrete bound on `k_I` |
 
-To open them locally (Python standard library only):
+To open them, run `python run.py` (Python standard library only), which serves `docs/` at http://127.0.0.1:8765 and opens the browser, or open `docs/index.html` directly. In the top bar, ◐ switches between the light and dark themes, and ♪ plays optional background music (credits in [`docs/audio/CREDITS.md`](docs/audio/CREDITS.md)).
 
-```bash
-python run.py            # serves docs/ at http://127.0.0.1:8765 and opens the browser
-```
-
-`docs/index.html` also opens directly from the disk. For GitHub Pages, select *Deploy from a branch*, branch `main`, folder `/docs`. Each page is a single HTML file that contains its style sheets, the KaTeX fonts, its script, its data, and its figures, so that a page view is one request (the video and the music load their files only when played). The pages therefore also work on hosts that serve every page in a sandboxed origin without CORS headers and limit the number of requests, such as the anonymized pages of anonymous.4open.science (175 requests per 15 minutes). That host also refuses to show a page inside another one, so there the pages open on their own instead of inside `player.html`, and the links between them carry the theme and the music. KaTeX (equations) and three.js r160 (3D views) are included in `docs/vendor/`. The ♪ button plays optional background music (calm piano pieces; public domain and CC BY 4.0, see `docs/audio/CREDITS.md`), and ◐ switches between the light and dark themes.
-
-The sources of the pages are the HTML outside the blocks marked `data-inline`, `docs/css/app.css`, and the ES modules in `docs/js/lib`, `docs/js/pages`, and `docs/js/sim` (the JavaScript port of `ehcc/`). After editing them, `docs/data/fields.json`, or `docs/img`, fill the `data-inline` blocks again (Node.js is needed; `npx` fetches esbuild):
-
-```bash
-python tools/build_web.py     # writes the style sheets, scripts, data, and figures into docs/*.html
-python run.py --sandbox       # check the pages as anonymous.4open.science serves them
-```
-
-## Python package
+## Reproducing the simulation results
 
 ```bash
 pip install -r requirements.txt
+```
+
+Run the scripts from the repository root. The figures are written to `outputs/figures/` (PDF and PNG).
+
+| Result | Script | Time |
+|---|---|---|
+| Fig. 4, 1D loop with discrete and continuous gate laws (Sec. V) | `python figures/fig4_ki_comparison.py` | 10 s |
+| Fig. 5, ergodic metric under parameter ablations (Sec. V-C) | `python figures/fig5_ablation.py` | 1 min |
+| Tables II and III, simulation benchmark (Sec. VI) | `python examples/benchmark.py` | 10 min |
+| Figs. 6 and 7, error, cost, and trajectories of the benchmark | `python figures/fig6_fig7_benchmark.py` | uses the runs of the benchmark |
+| Fig. 8, interleaved heterogeneity (Sec. VI-E) | `python figures/fig8_interleaved.py` (`--full` adds error and cost) | uses the runs of the benchmark |
+
+The benchmark runs are saved in `outputs/benchmark/<target>/<method>.npz`; the figure scripts compute them if they are missing. The computation times of the controllers (cost columns of the tables and cost panels of Figs. 6 and 8) depend on the machine.
+
+`python -m unittest discover tests -v` checks the model and reproduces, for target T4, the rows of Table II of EHCC (⟨ē⟩ = −0.11 °C, ⟨σ_e⟩ = 2.82 °C, ∫‖e‖ dt = 1.11 × 10⁵), Greedy-A, GTM, and LQG-M, as well as the equilibria of Fig. 4 (g* = 0.31, 0.03, 0.66).
+
+## Running EHCC
+
+```bash
 python examples/run_2d.py            # T4 "dignity", hot and cold disturbances -> outputs/T4/summary.png
 python examples/run_3d.py            # scanned sole surface and target of the 3D trial (Sec. VII)
 python examples/run_3d.py --live     # with a live Open3D window (pip install open3d)
-python examples/benchmark.py         # Tables II and III: six methods, T1-T5 and the interleaved case
-python -m unittest discover tests -v
 ```
 
 ```python
@@ -53,25 +58,9 @@ logs = sim.run(3000)                                  # 10 min of simulated time
 print(logs["e_mean"][-1], logs["d_lb"][-1])
 ```
 
-## Reproducing the simulation results of the paper
+The controllers use only `T`, `T*`, and the surface geometry. The thermal parameters are used only by the simulated plant.
 
-Run the scripts from the repository root; the figures are written to `outputs/figures/` (PDF and PNG).
-
-| Result | Script | Time |
-|---|---|---|
-| Fig. 4, 1D loop with discrete and continuous gate laws (Sec. V) | `python figures/fig4_ki_comparison.py` | 10 s |
-| Fig. 5, ergodic metric under parameter ablations (Sec. V-C) | `python figures/fig5_ablation.py` | 1 min |
-| Tables II and III, simulation benchmark (Sec. VI) | `python examples/benchmark.py` | 10 min |
-| Figs. 6 and 7, error, cost, and trajectories of the benchmark | `python figures/fig6_fig7_benchmark.py` | uses the runs of the benchmark |
-| Fig. 8, interleaved heterogeneity (Sec. VI-E) | `python figures/fig8_interleaved.py` (`--full` adds error and cost) | uses the runs of the benchmark |
-
-The benchmark runs are saved in `outputs/benchmark/<target>/<method>.npz` and computed by the figure scripts if missing. The computation times of the controllers (cost columns and the cost panels of Figs. 6 and 8) depend on the machine.
-
-## Tests
-
-The tests check the model (kernel normalization, monotone actuation, heat conservation of the diffusion step, spectral coefficients, orthonormal surface frame), reproduce the rows of Table II for target T4 of EHCC (⟨ē⟩ = −0.11 °C, ⟨σ_e⟩ = 2.82 °C, ∫‖e‖ dt = 1.11 × 10⁵), Greedy-A, GTM, and LQG-M, the monotone map of Lemma 1 and the regime equilibria of Fig. 4 (g* = 0.31, 0.03, 0.66), and the behaviour of the discrete gate for k_I = 0.1 and 20. `tests/test_web_parity.py` runs the JavaScript port of the pages with Node.js (skipped without it) and checks that it gives the same logs as the package, and `tests/test_web_build.py` checks that the pages are self-contained and match their sources.
-
-### Paper and code
+## Paper and code
 
 | Paper | Code |
 |---|---|
@@ -86,29 +75,28 @@ The tests check the model (kernel normalization, monotone actuation, heat conser
 | benchmark controllers EHCC-NA, Greedy-A, GTM (43), LQG-M, MPDC (44) (Sec. VI, Tables I and IX) | `benchmark.BenchmarkSimulation`, `baselines` |
 | idealized loop (27), `ē_ss(g)` (28), `g*`, `V(g)` (30), discrete gate (41)–(42) | `stability.Loop1D` |
 
-## Notes on the simulation
+## Simulation model and parameters
 
 - The dynamics evolve on the parametric domain `Ω = [0, 1]²` (100 × 100 grid, explicit Euler steps of 0.2 s); the 3D surface changes only the pose of the end effector. Distances on the surface are normalized; `domain_size` is the side of `Ω` in metres (0.35 m, or 0.47 m for the scanned surface).
 - `Ω_ROI` is the set where the target is above ambient, `T* > T_amb + 0.01 °C`, with `T_amb = min T*`. Outside `Ω_ROI` the material is an insulating backing: its coupling to the source, to the environment, and to its neighbours is reduced to 0.4.
-- The default parameters (`config.yaml`) are those of the simulation benchmark: `P = 1200 W`, `η ∈ [0, 0.9]`, `σ ∈ [0.02, 0.04]`, `d ∈ [0.05, 0.45] m`, `K = 15`, `s = 1.05`, `K_g = 0.4`, `u_max = 0.1` domain lengths per second, `k_I = 0.04` (0.02 for T5 and the interleaved case), `λ = 10⁻⁴`, `κ = 0.1`, `h = 6`, and `d_lb(0) = 0.2 m`. The heterogeneous layouts use rubber (`λ = 1.2 × 10⁻⁴`, `κ = 0.03`) and metal (twice the coupling, 8/3 of the conductivity).
+- The default parameters (`config.yaml`) are those of the simulation benchmark (Table VII): `P = 1200 W`, `η ∈ [0, 0.9]`, `σ ∈ [0.02, 0.04]`, `d ∈ [0.05, 0.45] m`, `K = 15`, `s = 1.05`, `K_g = 0.4`, `u_max = 0.1` domain lengths per second, `k_I = 0.04` (0.02 for T5 and the interleaved case), `λ = 10⁻⁴`, `κ = 0.1`, `h = 6`, and `d_lb(0) = 0.2 m`. The heterogeneous layouts use rubber (`λ = 1.2 × 10⁻⁴`, `κ = 0.03`) and metal (twice the coupling, 8/3 of the conductivity).
 - The scanned surface is the height field reconstructed from the RGB-D depth points of the 3D sole trial (`assets/surfaces/sole_3d_surface.npz`), and `assets/targets/sole_3d.npy` is the target of that trial (25–31 °C).
-- The controllers use only `T`, `T*`, and the surface geometry; the thermal parameters are used only by the simulated plant.
 
 ## Repository layout
 
 ```
-ehcc/                 Python package (config, domain, thermal, ergodic, standoff, surface, simulation, benchmark, baselines, stability, plotting, viewer3d)
-examples/             run_2d.py, run_3d.py, benchmark.py, export_web_data.py
-figures/              fig4_ki_comparison.py, fig5_ablation.py, fig6_fig7_benchmark.py, fig8_interleaved.py
-tests/                unit tests, rows of Table II, Fig. 4 equilibria, parity of the web port
-assets/               targets T1-T5, interleaved case, 3D trial; material layouts; scanned surface
-docs/                 interactive pages (one self-contained html file each) and their sources: css, js/sim (port of ehcc), js/lib, js/pages, data, img, audio, vendor
-tools/                build_web.py (writes the style sheets, scripts, data, and figures into the pages)
-config.yaml           default parameters
-run.py                local server for docs/
+ehcc/          Python package (config, domain, thermal, ergodic, standoff, surface, simulation, benchmark, baselines, stability, plotting, viewer3d)
+examples/      run_2d.py, run_3d.py, benchmark.py, export_web_data.py
+figures/       fig4_ki_comparison.py, fig5_ablation.py, fig6_fig7_benchmark.py, fig8_interleaved.py
+tests/         unit tests, rows of Table II, Fig. 4 equilibria, checks of the interactive pages
+assets/        targets T1-T5, interleaved case, 3D trial; material layouts; scanned surface
+docs/          interactive pages and video
+tools/         build of the interactive pages (see tools/README.md)
+config.yaml    default parameters
+run.py         local server for docs/
 ```
 
-`docs/data/fields.json` holds the targets, material layouts, and scanned surface resampled to the simulation grid; regenerate it with `python examples/export_web_data.py`, then run `python tools/build_web.py`.
+Notes on editing and building the interactive pages are in [`tools/README.md`](tools/README.md).
 
 ## Citation
 
@@ -128,5 +116,5 @@ run.py                local server for docs/
 ## Third-party files
 
 - KaTeX (MIT license), `docs/vendor/katex/`.
-- three.js r160 (MIT license), `docs/vendor/three/`; see the README there for the one-line change to `OrbitControls.js`.
+- three.js r160 (MIT license), `docs/vendor/three/`.
 - Background music: Erik Satie in public-domain recordings, and Kevin MacLeod (incompetech.com) under CC BY 4.0; attributions in `docs/audio/CREDITS.md`.
