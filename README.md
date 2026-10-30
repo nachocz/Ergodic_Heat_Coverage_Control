@@ -1,6 +1,24 @@
 # Ergodic Heat Coverage Control (EHCC)
 
-Code, interactive pages, and video for the paper *Ergodic Heat Coverage Control: Model-Free Robotic Regulation of Temperature Distributions*.
+**Accepted for publication in the IEEE Transactions on Robotics (T-RO).** If you use this code or the interactive pages, please cite the paper:
+
+I. Cuiral-Zueco, J. Thomas, and Y. Mezouar, "Ergodic Heat Coverage Control: Model-Free Robotic Regulation of Temperature Distributions," *IEEE Transactions on Robotics*, vol. &lt;volume&gt;, pp. &lt;pages&gt;, 2026, doi: &lt;doi&gt;.
+
+```bibtex
+@article{cuiralzueco2026ehcc,
+  author  = {Cuiral-Zueco, Ignacio and Thomas, John and Mezouar, Youcef},
+  title   = {Ergodic Heat Coverage Control: Model-Free Robotic Regulation of Temperature Distributions},
+  journal = {IEEE Transactions on Robotics},
+  year    = {2026},
+  volume  = {<volume>},
+  pages   = {<pages>},
+  doi     = {<doi>},
+}
+```
+
+Volume, pages, and DOI will be added when the article appears on IEEE Xplore.
+
+Code, interactive pages, and video for the paper *Ergodic Heat Coverage Control: Model-Free Robotic Regulation of Temperature Distributions*. The interactive pages are online at [ignaciocuiral.com/Ergodic_Heat_Coverage_Control](https://ignaciocuiral.com/Ergodic_Heat_Coverage_Control/player.html).
 
 A robot-mounted heat source drives the temperature field `T(x, t)` of a material surface to a target distribution `T*(x)` on a region of interest `Ω_ROI`, without a thermal model of the material. EHCC closes the loop on the measured error `e = T* − T` with two decoupled controllers: an ergodic coverage controller moves the focal point `p(t)` so that the time-averaged heat footprint matches the heat deficit `e₊`, and a standoff controller sets the source-to-surface distance `d(t)`, and with it the injected power, through an integral law on the mean error. The stability analysis establishes global uniform ultimate boundedness (GUUB) of the closed loop.
 
@@ -97,21 +115,6 @@ run.py         local server for docs/
 ```
 
 Notes on editing and building the interactive pages are in [`tools/README.md`](tools/README.md).
-
-## Citation
-
-```bibtex
-@article{ehcc,
-  author  = {<Author 1> and <Author 2>},
-  title   = {Ergodic Heat Coverage Control: Model-Free Robotic Regulation of Temperature Distributions},
-  journal = {<Journal>},
-  year    = {<year>},
-  volume  = {<volume>},
-  number  = {<number>},
-  pages   = {<pages>},
-  doi     = {<doi>},
-}
-```
 
 ## Third-party files
 

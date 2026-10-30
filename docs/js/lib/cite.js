@@ -1,18 +1,17 @@
-// Citation dialog. Author names and publication details are placeholders until
-// the article appears.
+// Citation dialog. The article is accepted in the IEEE Transactions on Robotics;
+// volume, pages, and DOI are placeholders until it appears on IEEE Xplore.
 import { h } from './ui.js';
 
 const TITLE = 'Ergodic Heat Coverage Control: Model-Free Robotic Regulation of Temperature Distributions';
 
-const CITATION = `<Authors>, "${TITLE}," <Journal>, <volume>(<number>), <pages>, <year>. doi: <doi>.`;
+const CITATION = `I. Cuiral-Zueco, J. Thomas, and Y. Mezouar, "${TITLE}," IEEE Transactions on Robotics, vol. <volume>, pp. <pages>, 2026, doi: <doi>.`;
 const BIBTEX = [
-    '@article{ehcc,',
-    '  author  = {<Author 1> and <Author 2>},',
+    '@article{cuiralzueco2026ehcc,',
+    '  author  = {Cuiral-Zueco, Ignacio and Thomas, John and Mezouar, Youcef},',
     `  title   = {${TITLE}},`,
-    '  journal = {<Journal>},',
-    '  year    = {<year>},',
+    '  journal = {IEEE Transactions on Robotics},',
+    '  year    = {2026},',
     '  volume  = {<volume>},',
-    '  number  = {<number>},',
     '  pages   = {<pages>},',
     '  doi     = {<doi>},',
     '}',
@@ -43,7 +42,7 @@ export function citeDialog() {
     const dialog = h('dialog', { class: 'cite-dialog', 'aria-labelledby': 'citeTitle' },
         h('p', { class: 'kicker' }, 'Citation'),
         h('h2', { id: 'citeTitle' }, 'Cite the paper'),
-        h('p', { class: 'cite-note' }, 'Author names and publication details are placeholders until the article appears.'),
+        h('p', { class: 'cite-note' }, 'Accepted for publication in the IEEE Transactions on Robotics (T-RO). Volume, pages, and DOI will be added when the article appears on IEEE Xplore.'),
         block('Reference', CITATION),
         block('BibTeX', BIBTEX),
         h('div', { class: 'cite-actions' }, close));
