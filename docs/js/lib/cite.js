@@ -1,19 +1,19 @@
-// Citation dialog. The article is accepted in the IEEE Transactions on Robotics;
-// volume, pages, and DOI are placeholders until it appears on IEEE Xplore.
+// Citation dialog. The article is on IEEE Xplore (Early Access); the volume and the
+// final page numbers are added when it is assigned to an issue.
 import { h } from './ui.js';
 
 const TITLE = 'Ergodic Heat Coverage Control: Model-Free Robotic Regulation of Temperature Distributions';
+const DOI = '10.1109/TRO.2026.3752259';
 
-const CITATION = `I. Cuiral-Zueco, J. Thomas, and Y. Mezouar, "${TITLE}," IEEE Transactions on Robotics, vol. <volume>, pp. <pages>, 2026, doi: <doi>.`;
+const CITATION = `I. Cuiral-Zueco, J. Thomas, and Y. Mezouar, "${TITLE}," IEEE Transactions on Robotics, pp. 1–20, 2026, doi: ${DOI}.`;
 const BIBTEX = [
     '@article{cuiralzueco2026ehcc,',
     '  author  = {Cuiral-Zueco, Ignacio and Thomas, John and Mezouar, Youcef},',
     `  title   = {${TITLE}},`,
     '  journal = {IEEE Transactions on Robotics},',
     '  year    = {2026},',
-    '  volume  = {<volume>},',
-    '  pages   = {<pages>},',
-    '  doi     = {<doi>},',
+    '  pages   = {1--20},',
+    `  doi     = {${DOI}},`,
     '}',
 ].join('\n');
 
@@ -42,7 +42,8 @@ export function citeDialog() {
     const dialog = h('dialog', { class: 'cite-dialog', 'aria-labelledby': 'citeTitle' },
         h('p', { class: 'kicker' }, 'Citation'),
         h('h2', { id: 'citeTitle' }, 'Cite the paper'),
-        h('p', { class: 'cite-note' }, 'Accepted for publication in the IEEE Transactions on Robotics (T-RO). Volume, pages, and DOI will be added when the article appears on IEEE Xplore.'),
+        h('p', { class: 'cite-note' }, 'IEEE Transactions on Robotics (T-RO), Early Access on IEEE Xplore: ',
+            h('a', { href: `https://doi.org/${DOI}`, target: '_blank', rel: 'noopener noreferrer' }, `doi.org/${DOI}`), '.'),
         block('Reference', CITATION),
         block('BibTeX', BIBTEX),
         h('div', { class: 'cite-actions' }, close));

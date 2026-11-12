@@ -1,8 +1,8 @@
 # Ergodic Heat Coverage Control (EHCC)
 
-**Accepted for publication in the IEEE Transactions on Robotics (T-RO).** If you use this code or the interactive pages, please cite the paper:
+**Published in the IEEE Transactions on Robotics (T-RO), Early Access: [doi.org/10.1109/TRO.2026.3752259](https://doi.org/10.1109/TRO.2026.3752259).** If you use this code or the interactive pages, please cite the paper:
 
-I. Cuiral-Zueco, J. Thomas, and Y. Mezouar, "Ergodic Heat Coverage Control: Model-Free Robotic Regulation of Temperature Distributions," *IEEE Transactions on Robotics*, vol. &lt;volume&gt;, pp. &lt;pages&gt;, 2026, doi: &lt;doi&gt;.
+I. Cuiral-Zueco, J. Thomas, and Y. Mezouar, "Ergodic Heat Coverage Control: Model-Free Robotic Regulation of Temperature Distributions," *IEEE Transactions on Robotics*, pp. 1–20, 2026, doi: 10.1109/TRO.2026.3752259.
 
 ```bibtex
 @article{cuiralzueco2026ehcc,
@@ -10,13 +10,12 @@ I. Cuiral-Zueco, J. Thomas, and Y. Mezouar, "Ergodic Heat Coverage Control: Mode
   title   = {Ergodic Heat Coverage Control: Model-Free Robotic Regulation of Temperature Distributions},
   journal = {IEEE Transactions on Robotics},
   year    = {2026},
-  volume  = {<volume>},
-  pages   = {<pages>},
-  doi     = {<doi>},
+  pages   = {1--20},
+  doi     = {10.1109/TRO.2026.3752259},
 }
 ```
 
-Volume, pages, and DOI will be added when the article appears on IEEE Xplore.
+The volume and the final page numbers will be added when the article is assigned to an issue.
 
 Code, interactive pages, and video for the paper *Ergodic Heat Coverage Control: Model-Free Robotic Regulation of Temperature Distributions*. The interactive pages are online at [ignaciocuiral.com/Ergodic_Heat_Coverage_Control](https://ignaciocuiral.com/Ergodic_Heat_Coverage_Control/player.html).
 
